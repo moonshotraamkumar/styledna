@@ -1040,7 +1040,7 @@ body::after {
   <div class="backdrop" id="backdrop" onclick="closeStyleSheet()"></div>
 
   <!-- Style preview sheet (Recently Decoded) -->
-  <div class="sheet" id="style-sheet" style="max-height:80%;overflow-y:auto">
+  <div class="sheet" id="style-sheet" style="bottom:0;max-height:92%;overflow-y:auto;z-index:750">
     <div class="handle"></div>
     <div class="ssheet-head">
       <div class="ssheet-chip" id="ssheet-chip">Style DNA</div>
@@ -1136,52 +1136,82 @@ const STYLE_DATA = {
   'quiet-luxury': {
     label: 'Quiet Luxury',
     desc: 'Understated elegance — quality over logos. Clean silhouettes, neutral tones, and impeccable tailoring that speaks in whispers.',
-    imgs: [
+    women: [
       'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=450&fit=crop&q=80',
       'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1594938298603-c8148c4b4357?w=400&h=533&fit=crop&q=80',
-    ]
+    ],
+    men: [
+      'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=533&fit=crop&q=80',
+    ],
   },
   'urban-edge': {
     label: 'Urban Edge',
     desc: 'Streetwear with a sharp attitude. Dark palettes, graphic layers, and silhouettes built for the city.',
-    imgs: [
+    women: [
       'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=450&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=533&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1571513722275-4b41940f54b8?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=533&fit=crop&q=80',
-    ]
+      'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=533&fit=crop&q=80',
+    ],
+    men: [
+      'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1547grown-3a63f15732ce?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=400&h=533&fit=crop&q=80',
+    ],
   },
   'soft-minimalist': {
     label: 'Soft Minimalist',
     desc: 'Calm, airy, effortless. Pastels and clean cuts with a thoughtful edit — nothing extra, everything intentional.',
-    imgs: [
+    women: [
       'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=800&h=450&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=533&fit=crop&q=80',
-    ]
+      'https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=400&h=533&fit=crop&q=80',
+    ],
+    men: [
+      'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1584999734482-0361aecad844?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=400&h=533&fit=crop&q=80',
+    ],
   },
   'boho-luxe': {
     label: 'Boho Luxe',
     desc: 'Warm textures, layered beauty. Earth-toned florals and artisan pieces that feel free-spirited yet considered.',
-    imgs: [
+    women: [
       'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=450&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1517441169886-9d6a7ffd5fac?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=533&fit=crop&q=80',
-    ]
+      'https://images.unsplash.com/photo-1517441169886-9d6a7ffd5fac?w=400&h=533&fit=crop&q=80',
+    ],
+    men: [
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=533&fit=crop&q=80',
+    ],
   },
   'editorial-chic': {
     label: 'Editorial Chic',
     desc: 'Fashion as art. Bold cuts, unexpected combinations, and a confidence that makes every street a runway.',
-    imgs: [
+    women: [
       'https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=800&h=450&fit=crop&q=80',
       'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=533&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1475180429745-7f68d7692c6b?w=400&h=533&fit=crop&q=80',
       'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&h=533&fit=crop&q=80',
-    ]
+      'https://images.unsplash.com/photo-1475180429745-7f68d7692c6b?w=400&h=533&fit=crop&q=80',
+    ],
+    men: [
+      'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=533&fit=crop&q=80',
+    ],
   },
 };
 
@@ -1189,12 +1219,14 @@ const STYLE_DATA = {
 function openStyleSheet(key) {
   const s = STYLE_DATA[key];
   if (!s) return;
+  const imgs = userGender === 'men' ? s.men : s.women;
   document.getElementById('ssheet-chip').textContent = 'Style DNA';
   document.getElementById('ssheet-title').textContent = s.label;
   document.getElementById('ssheet-desc').textContent = s.desc;
-  document.getElementById('ssheet-grid').innerHTML = s.imgs.map((src, i) =>
+  document.getElementById('ssheet-grid').innerHTML = imgs.map(src =>
     `<img class="ssheet-img" src="${src}" alt="${s.label}" loading="lazy" />`
   ).join('');
+  document.getElementById('style-sheet').scrollTop = 0;
   document.getElementById('backdrop').classList.add('open');
   document.getElementById('style-sheet').classList.add('open');
 }
