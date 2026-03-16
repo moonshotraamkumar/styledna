@@ -534,10 +534,10 @@ body::after {
   background: var(--surface); border-top: 1px solid var(--border);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0; z-index: 700;
   transform: translateY(100%); transition: transform 0.4s var(--ease-out);
-  padding: 10px 20px 28px;
+  padding: 0 0 28px;
 }
 .sheet.open { transform: translateY(0); }
-.handle { width: 34px; height: 4px; background: var(--surface-3); border-radius: 2px; margin: 0 auto 18px; }
+.handle { width: 34px; height: 4px; background: var(--surface-3); border-radius: 2px; margin: 14px auto 20px; }
 .sheet-name { font-family: var(--font-display); font-size: 1.18rem; font-weight: 400; color: var(--fg); margin-bottom: 3px; }
 .sheet-sub { font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 18px; }
 .price-rows { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
@@ -566,8 +566,15 @@ body::after {
 }
 .buy-btn:active { transform: scale(0.98); }
 
+/* ── Gender toggle ── */
+.gender-row { display: flex; align-items: center; gap: 12px; padding: 0 20px 4px; }
+.gender-label { font-family: var(--font-ui); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted); flex-shrink: 0; }
+.gender-opts { display: flex; gap: 6px; }
+.gender-btn { font-family: var(--font-ui); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface-2); color: var(--fg-muted); cursor: pointer; transition: all 0.18s; -webkit-tap-highlight-color: transparent; }
+.gender-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
 /* ── Style preview sheet ── */
-.ssheet-head { padding: 0 20px 16px; }
+.ssheet-head { padding: 0 20px 18px; }
 .ssheet-chip { display: inline-block; font-family: var(--font-ui); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(204,95,53,0.22); border-radius: 100px; padding: 4px 10px; margin-bottom: 8px; }
 .ssheet-title { font-family: var(--font-display); font-size: 1.65rem; font-style: italic; font-weight: 400; color: var(--fg); line-height: 1.1; margin-bottom: 10px; }
 .ssheet-desc { font-size: 0.82rem; font-weight: 300; color: var(--fg-muted); line-height: 1.6; }
@@ -794,7 +801,16 @@ body::after {
         <div class="added-tags" id="added-tags"></div>
       </div>
 
-      <div class="analyze-wrap a5">
+      <div class="gender-row a5">
+        <div class="gender-label">Shop for</div>
+        <div class="gender-opts">
+          <button class="gender-btn active" data-g="women" onclick="setGender(this)">Women</button>
+          <button class="gender-btn" data-g="men" onclick="setGender(this)">Men</button>
+          <button class="gender-btn" data-g="all" onclick="setGender(this)">Everyone</button>
+        </div>
+      </div>
+
+      <div class="analyze-wrap">
         <button class="analyze-btn" onclick="startAnalysis()">
           <span>Decode My Style DNA</span><span>✦</span>
         </button>
@@ -1024,7 +1040,7 @@ body::after {
   <div class="backdrop" id="backdrop" onclick="closeStyleSheet()"></div>
 
   <!-- Style preview sheet (Recently Decoded) -->
-  <div class="sheet" id="style-sheet" style="max-height:78%;overflow-y:auto;padding-bottom:32px">
+  <div class="sheet" id="style-sheet" style="max-height:80%;overflow-y:auto">
     <div class="handle"></div>
     <div class="ssheet-head">
       <div class="ssheet-chip" id="ssheet-chip">Style DNA</div>
@@ -1047,7 +1063,7 @@ function randBetween(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 async function fetchProducts() {
   showSkeletons();
   try {
-    const r = await fetch('/api/products?style=default');
+    const r = await fetch(`/api/products?style=default&gender=${userGender}`);
     if (!r.ok) throw new Error('API error ' + r.status);
     const data = await r.json();
 
@@ -1202,6 +1218,14 @@ const tabMap = {
 };
 let activeTab = 'dna';
 let dnaBuilt = false;
+let userGender = 'women';
+
+function setGender(btn) {
+  userGender = btn.dataset.g;
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  fetchProducts(); // reload with new gender
+}
 
 function switchTab(tab) {
   document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));

@@ -1,13 +1,19 @@
 // StyleDNA — Product search via Etsy Open API v3
 const ETSY_KEY = process.env.ETSY_API_KEY;
 
-const STYLE_QUERIES = {
-  'quiet-luxury':    ['cashmere sweater', 'minimal coat', 'silk blouse', 'tailored trousers'],
-  'urban-edge':      ['oversized jacket', 'cargo pants', 'graphic tee', 'streetwear jacket'],
-  'soft-minimalist': ['linen shirt', 'neutral dress', 'wide leg pants', 'minimalist top'],
-  'boho-luxe':       ['floral maxi dress', 'boho top', 'suede boots', 'woven tote bag'],
-  'editorial-chic':  ['structured blazer', 'statement coat', 'bold print dress', 'avant garde top'],
-  'default':         ['fashion top', 'linen shirt', 'minimal jacket', 'trousers', 'loafers'],
+const QUERIES = {
+  women: ['womens fashion top', 'womens minimal dress', 'womens linen shirt', 'womens blazer', 'womens wide leg pants', 'womens loafers'],
+  men:   ['mens fashion shirt', 'mens minimal jacket', 'mens linen trousers', 'mens blazer', 'mens chinos', 'mens chelsea boots'],
+  all:   ['unisex fashion top', 'minimal linen shirt', 'oversized jacket', 'fashion sneakers', 'minimal coat', 'fashion trousers'],
+};
+
+const STYLE_SUFFIX = {
+  'quiet-luxury':    'minimal luxury',
+  'urban-edge':      'streetwear',
+  'soft-minimalist': 'minimal clean',
+  'boho-luxe':       'boho',
+  'editorial-chic':  'editorial fashion',
+  'default':         '',
 };
 
 module.exports = async function handler(req, res) {
@@ -17,9 +23,13 @@ module.exports = async function handler(req, res) {
     return res.status(503).json({ error: 'ETSY_API_KEY not configured' });
   }
 
-  const style = req.query.style || 'default';
-  const queries = STYLE_QUERIES[style] || STYLE_QUERIES.default;
-  const query = queries[Math.floor(Math.random() * queries.length)];
+  const gender = req.query.gender || 'women';
+  const style  = req.query.style  || 'default';
+
+  const pool   = QUERIES[gender] || QUERIES.all;
+  const suffix = STYLE_SUFFIX[style] || '';
+  const base   = pool[Math.floor(Math.random() * pool.length)];
+  const query  = suffix ? `${base} ${suffix}` : base;
 
   try {
     const url = 'https://openapi.etsy.com/v3/application/listings/active?' +
