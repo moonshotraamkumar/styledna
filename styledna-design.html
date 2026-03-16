@@ -1047,19 +1047,21 @@ body::after {
 let products = [];
 
 /* ── DummyJSON fetch ── */
-const FASHION_CATS = ['tops','womens-dresses','womens-bags','sunglasses','mens-shirts'];
+const FASHION_CATS = ['tops','mens-shirts','mens-shoes','womens-shoes','sunglasses','mens-watches'];
 const RETAILERS = [
   {r:'ASOS',     icon:'🟠'}, {r:'Zara',    icon:'⬛'},
   {r:'H&M',      icon:'🔴'}, {r:'Uniqlo',  icon:'🔵'},
   {r:'Mango',    icon:'🟣'}, {r:'Amazon',  icon:'🟡'},
 ];
 const CAT_MATCH = {
-  'womens-dresses': [94,97], tops:[88,94],
-  'mens-shirts':[85,91], 'womens-bags':[80,87], sunglasses:[78,84],
+  'tops':[88,94], 'mens-shirts':[85,92],
+  'mens-shoes':[82,90], 'womens-shoes':[84,91],
+  'sunglasses':[78,86], 'mens-watches':[75,83],
 };
 const CAT_BRAND = {
-  'womens-dresses':'Zara','tops':'ASOS',
-  'mens-shirts':'Uniqlo','womens-bags':'Mango',sunglasses:'H&M',
+  'tops':'ASOS', 'mens-shirts':'Uniqlo',
+  'mens-shoes':'Zara', 'womens-shoes':'Mango',
+  'sunglasses':'H&M', 'mens-watches':'Amazon',
 };
 
 function makePrices(basePrice) {
