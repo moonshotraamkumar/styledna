@@ -566,6 +566,15 @@ body::after {
 }
 .buy-btn:active { transform: scale(0.98); }
 
+/* ── Style preview sheet ── */
+.ssheet-head { padding: 0 20px 16px; }
+.ssheet-chip { display: inline-block; font-family: var(--font-ui); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(204,95,53,0.22); border-radius: 100px; padding: 4px 10px; margin-bottom: 8px; }
+.ssheet-title { font-family: var(--font-display); font-size: 1.65rem; font-style: italic; font-weight: 400; color: var(--fg); line-height: 1.1; margin-bottom: 10px; }
+.ssheet-desc { font-size: 0.82rem; font-weight: 300; color: var(--fg-muted); line-height: 1.6; }
+.ssheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px 20px 0; }
+.ssheet-img { width: 100%; aspect-ratio: 3/4; border-radius: var(--radius-md); object-fit: cover; background: var(--surface-2); display: block; }
+.ssheet-img:first-child { grid-column: span 2; aspect-ratio: 16/9; }
+
 /* ── Placeholder screens ── */
 .ph-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
 .ph-icon { font-size: 2.8rem; margin-bottom: 14px; }
@@ -795,7 +804,7 @@ body::after {
       <div class="recent-dna-sec">
         <div class="section-chip" style="margin:0 20px 12px">Recently Decoded</div>
         <div class="recent-scroll">
-          <div class="rdna-card" onclick="switchTab('dna-result')">
+          <div class="rdna-card" onclick="openStyleSheet('quiet-luxury')">
             <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=256&h=384&fit=crop&q=80')"></div>
             <div class="rdna-gradient"></div>
             <div class="rdna-badge">94%</div>
@@ -807,7 +816,7 @@ body::after {
               </div>
             </div>
           </div>
-          <div class="rdna-card">
+          <div class="rdna-card" onclick="openStyleSheet('urban-edge')">
             <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=256&h=384&fit=crop&q=80')"></div>
             <div class="rdna-gradient"></div>
             <div class="rdna-badge">88%</div>
@@ -819,7 +828,7 @@ body::after {
               </div>
             </div>
           </div>
-          <div class="rdna-card">
+          <div class="rdna-card" onclick="openStyleSheet('soft-minimalist')">
             <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=256&h=384&fit=crop&q=80')"></div>
             <div class="rdna-gradient"></div>
             <div class="rdna-badge">91%</div>
@@ -831,7 +840,7 @@ body::after {
               </div>
             </div>
           </div>
-          <div class="rdna-card">
+          <div class="rdna-card" onclick="openStyleSheet('boho-luxe')">
             <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=256&h=384&fit=crop&q=80')"></div>
             <div class="rdna-gradient"></div>
             <div class="rdna-badge">86%</div>
@@ -843,7 +852,7 @@ body::after {
               </div>
             </div>
           </div>
-          <div class="rdna-card">
+          <div class="rdna-card" onclick="openStyleSheet('editorial-chic')">
             <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=256&h=384&fit=crop&q=80')"></div>
             <div class="rdna-gradient"></div>
             <div class="rdna-badge">93%</div>
@@ -1017,15 +1026,18 @@ body::after {
   </div>
 
   <!-- Sheet backdrop -->
-  <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
+  <div class="backdrop" id="backdrop" onclick="closeStyleSheet()"></div>
 
-  <!-- Price sheet -->
-  <div class="sheet" id="sheet">
+  <!-- Style preview sheet (Recently Decoded) -->
+  <div class="sheet" id="style-sheet" style="max-height:78%;overflow-y:auto;padding-bottom:32px">
     <div class="handle"></div>
-    <div class="sheet-name" id="sheet-name"></div>
-    <div class="sheet-sub">Best price across retailers</div>
-    <div class="price-rows" id="sheet-prices"></div>
-    <button class="buy-btn" onclick="closeSheet()"><span>Buy at Best Price</span><span>→</span></button>
+    <div class="ssheet-head">
+      <div class="ssheet-chip" id="ssheet-chip">Style DNA</div>
+      <div class="ssheet-title" id="ssheet-title">Quiet Luxury</div>
+      <div class="ssheet-desc" id="ssheet-desc"></div>
+    </div>
+    <div class="ssheet-grid" id="ssheet-grid"></div>
+    <button class="buy-btn" style="margin:16px 20px 0;width:calc(100% - 40px)" onclick="closeStyleSheet()">Decode My Own DNA ✦</button>
   </div>
 
 </div><!-- .app -->
@@ -1114,7 +1126,7 @@ function cardHTML(p) {
   const imgContent = p.img
     ? `<img src="${p.img}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" />`
     : `<div class="pimg-bg" style="background:linear-gradient(145deg,#2A2520,#3D3328)"></div>`;
-  return `<div class="pcard" onclick="openSheet(${p.id})">
+  return `<div class="pcard">
     <div class="pimg">
       ${imgContent}
       <div class="match-badge">✦ ${p.match}%</div>
@@ -1125,7 +1137,7 @@ function cardHTML(p) {
       <div class="pname">${p.name}</div>
       <div class="pprice-row">
         <div class="pprice${p.deal?' deal':''}">$${p.price.toFixed(2)}</div>
-        <div class="pstores">${p.prices.length} stores</div>
+        <a class="pstores" href="https://google.com/shopping/product/1?q=${encodeURIComponent(p.name)}" target="_blank" onclick="event.stopPropagation()" style="text-decoration:none">Best price →</a>
       </div>
     </div>
   </div>`;
@@ -1138,31 +1150,76 @@ function renderGrid(id, items) {
 /* load on startup */
 fetchProducts();
 
-/* ── Price sheet ── */
-function openSheet(id) {
-  const p = products.find(x=>x.id===id);
-  if(!p) return;
-  document.getElementById('sheet-name').textContent = p.name;
-  document.getElementById('sheet-prices').innerHTML = p.prices.map(r=>`
-    <div class="price-row${r.best?' best':''}" onclick="closeSheet()">
-      <div class="pr-left">
-        <div class="pr-logo">${r.icon}</div>
-        <div>
-          <div class="pr-retailer">${r.r}</div>
-          ${r.best?'<div class="pr-best-lbl">Best price</div>':''}
-        </div>
-      </div>
-      <div class="pr-right">
-        <div class="pr-price${r.best?' best':' hi'}">$${r.p.toFixed(2)}</div>
-        ${r.best&&r.save?`<div class="pr-save">Save $${r.save}</div>`:''}
-      </div>
-    </div>`).join('');
+/* ── Style preview data ── */
+const STYLE_DATA = {
+  'quiet-luxury': {
+    label: 'Quiet Luxury',
+    desc: 'Understated elegance — quality over logos. Clean silhouettes, neutral tones, and impeccable tailoring that speaks in whispers.',
+    imgs: [
+      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1594938298603-c8148c4b4357?w=400&h=533&fit=crop&q=80',
+    ]
+  },
+  'urban-edge': {
+    label: 'Urban Edge',
+    desc: 'Streetwear with a sharp attitude. Dark palettes, graphic layers, and silhouettes built for the city.',
+    imgs: [
+      'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=533&fit=crop&q=80',
+    ]
+  },
+  'soft-minimalist': {
+    label: 'Soft Minimalist',
+    desc: 'Calm, airy, effortless. Pastels and clean cuts with a thoughtful edit — nothing extra, everything intentional.',
+    imgs: [
+      'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=533&fit=crop&q=80',
+    ]
+  },
+  'boho-luxe': {
+    label: 'Boho Luxe',
+    desc: 'Warm textures, layered beauty. Earth-toned florals and artisan pieces that feel free-spirited yet considered.',
+    imgs: [
+      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1517441169886-9d6a7ffd5fac?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=533&fit=crop&q=80',
+    ]
+  },
+  'editorial-chic': {
+    label: 'Editorial Chic',
+    desc: 'Fashion as art. Bold cuts, unexpected combinations, and a confidence that makes every street a runway.',
+    imgs: [
+      'https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=800&h=450&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1475180429745-7f68d7692c6b?w=400&h=533&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&h=533&fit=crop&q=80',
+    ]
+  },
+};
+
+/* ── Style sheet ── */
+function openStyleSheet(key) {
+  const s = STYLE_DATA[key];
+  if (!s) return;
+  document.getElementById('ssheet-chip').textContent = 'Style DNA';
+  document.getElementById('ssheet-title').textContent = s.label;
+  document.getElementById('ssheet-desc').textContent = s.desc;
+  document.getElementById('ssheet-grid').innerHTML = s.imgs.map((src, i) =>
+    `<img class="ssheet-img" src="${src}" alt="${s.label}" loading="lazy" />`
+  ).join('');
   document.getElementById('backdrop').classList.add('open');
-  document.getElementById('sheet').classList.add('open');
+  document.getElementById('style-sheet').classList.add('open');
 }
-function closeSheet() {
+function closeStyleSheet() {
   document.getElementById('backdrop').classList.remove('open');
-  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('style-sheet').classList.remove('open');
 }
 
 /* ── Save toggle ── */
@@ -1191,7 +1248,7 @@ function switchTab(tab) {
   const btn = document.getElementById(tabId);
   if(btn) btn.classList.add('active');
   activeTab = tab;
-  closeSheet();
+  closeStyleSheet();
 }
 
 /* ── Quick-entry from home (MVP path) ── */
