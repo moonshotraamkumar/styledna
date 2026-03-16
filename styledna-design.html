@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>StyleHits</title>
+<title>StyleDNA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet">
@@ -48,10 +48,10 @@ body::after {
   content: '';
   position: fixed; inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.03; pointer-events: none; z-index: 9998;
+  opacity: 0.025; pointer-events: none; z-index: 9998;
 }
 
-/* ── App shell (iPhone viewport) ── */
+/* ── App shell ── */
 .app {
   width: 100%; max-width: 430px;
   height: 100%; max-height: 932px;
@@ -80,7 +80,6 @@ body::after {
   height: var(--tab-h);
   background: rgba(18,16,13,0.96);
   backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-top: 1px solid var(--border);
   display: flex; align-items: flex-start; padding-top: 10px;
   z-index: 500;
@@ -124,7 +123,7 @@ body::after {
 .icon-btn:active { transform: scale(0.88); }
 
 /* ───────────────────────────────────────────
-   SCREEN 1 — HOME
+   SCREEN 1 — HOME (with MVP DNA entry)
 ─────────────────────────────────────────── */
 .home-topbar {
   padding: 52px 20px 14px;
@@ -134,7 +133,8 @@ body::after {
 .logo-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-left: 2px; vertical-align: super; }
 .greeting { font-family: var(--font-body); font-size: 0.72rem; font-weight: 300; color: var(--fg-muted); margin-bottom: 2px; }
 
-.home-hero {
+/* ── MVP Entry Card (first-run state) ── */
+.mvp-entry {
   margin: 12px 20px 0;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -142,6 +142,124 @@ body::after {
   padding: 22px;
   position: relative; overflow: hidden;
 }
+.mvp-entry::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(204,95,53,0.12) 0%, transparent 68%);
+  pointer-events: none;
+}
+.mvp-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--accent-glow); border: 1px solid rgba(204,95,53,0.22);
+  border-radius: 100px; padding: 4px 11px;
+  font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-light);
+  margin-bottom: 10px;
+}
+.mvp-badge::before { content: '✦'; font-size: 0.48rem; }
+.mvp-headline {
+  font-family: var(--font-display); font-size: 1.68rem; font-weight: 400;
+  line-height: 1.12; margin-bottom: 6px;
+}
+.mvp-headline em { font-style: italic; color: var(--tan); }
+.mvp-sub {
+  font-size: 0.74rem; font-weight: 300; color: var(--fg-muted);
+  line-height: 1.5; margin-bottom: 18px; max-width: 230px;
+}
+
+/* ── Quick DNA input (the MVP) ── */
+.quick-dna {
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 5px 5px 5px 14px;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.quick-dna:focus-within {
+  border-color: rgba(204,95,53,0.4);
+  box-shadow: 0 0 0 3px rgba(204,95,53,0.07);
+}
+.quick-dna-inp {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: var(--font-body); font-size: 0.78rem; font-weight: 300;
+  color: var(--fg); min-width: 0;
+}
+.quick-dna-inp::placeholder { color: var(--fg-dim); }
+.quick-dna-sep {
+  width: 1px; height: 22px; background: var(--border-strong); flex-shrink: 0;
+}
+.quick-upload-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: var(--surface-3); border: 1px solid var(--border);
+  font-size: 1rem; cursor: pointer; transition: transform 0.15s var(--spring);
+}
+.quick-upload-btn:active { transform: scale(0.88); }
+.quick-upload-preview {
+  display: flex; align-items: center; gap: 5px; overflow-x: auto;
+  scrollbar-width: none; padding: 2px 0;
+}
+.quick-upload-preview::-webkit-scrollbar { display: none; }
+.quick-thumb {
+  width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+  animation: popIn 0.28s var(--spring) both;
+}
+.qthumb-rm {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+  display: none; align-items: center; justify-content: center;
+  font-size: 0.5rem; color: white; cursor: pointer;
+}
+.quick-thumb:hover .qthumb-rm { display: flex; }
+.analyze-go {
+  background: var(--accent); border: none;
+  border-radius: 10px; padding: 10px 14px; flex-shrink: 0;
+  font-family: var(--font-ui); font-size: 0.62rem; font-weight: 700;
+  color: white; letter-spacing: 0.07em; text-transform: uppercase;
+  cursor: pointer; display: flex; align-items: center; gap: 5px;
+  transition: transform 0.15s var(--spring);
+  white-space: nowrap;
+}
+.analyze-go:active { transform: scale(0.92); }
+
+.or-divider {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ui); font-size: 0.56rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-dim);
+  margin-bottom: 12px;
+}
+.or-divider::before, .or-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.quick-method-row {
+  display: flex; gap: 8px;
+}
+.qmethod-btn {
+  flex: 1; background: var(--surface-3); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 10px 8px;
+  font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--fg-muted);
+  cursor: pointer; text-align: center; transition: all 0.18s var(--ease-out);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.qmethod-btn:hover { border-color: rgba(204,95,53,0.3); color: var(--accent-light); background: var(--accent-glow); }
+.qmethod-btn:active { transform: scale(0.95); }
+.qmethod-icon { font-size: 1.1rem; }
+
+/* ── Active DNA hero (after DNA exists) ── */
+.home-hero {
+  display: none;
+  margin: 12px 20px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 22px;
+  position: relative; overflow: hidden;
+}
+.home-hero.visible { display: block; }
 .home-hero::before {
   content: ''; position: absolute; top: -50px; right: -50px;
   width: 200px; height: 200px; border-radius: 50%;
@@ -244,11 +362,25 @@ body::after {
   background: var(--surface); border: 1.5px dashed var(--border-strong);
   border-radius: var(--radius-xl); padding: 38px 20px; text-align: center;
   cursor: pointer; transition: all 0.2s;
+  position: relative;
 }
 .drop-zone:active { transform: scale(0.99); background: var(--surface-2); }
+.drop-zone.has-photos { padding: 18px 20px; border-style: solid; border-color: rgba(204,95,53,0.25); background: var(--surface-2); }
 .dz-icon { font-size: 1.8rem; display: block; margin-bottom: 11px; }
 .dz-title { font-family: var(--font-ui); font-size: 0.75rem; font-weight: 700; color: var(--fg); margin-bottom: 4px; letter-spacing: 0.03em; }
 .dz-sub { font-size: 0.7rem; font-weight: 300; color: var(--fg-muted); }
+.dz-add-more {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--accent);
+  background: none; border: 1px solid rgba(204,95,53,0.25);
+  border-radius: 100px; padding: 5px 12px; cursor: pointer;
+  transition: transform 0.15s var(--spring);
+}
+.dz-add-more:active { transform: scale(0.92); }
+
+/* Hidden file input */
+#file-input { display: none; }
 
 .ugrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 0 20px 14px; }
 .uthumb {
@@ -448,6 +580,58 @@ body::after {
 .a4{animation:fadeUp 0.5s var(--ease-out) 0.28s both}
 .a5{animation:fadeUp 0.5s var(--ease-out) 0.36s both}
 
+/* ── Recent DNA slider ── */
+.recent-dna-sec { padding-top: 22px; }
+.recent-scroll {
+  display: flex; gap: 10px;
+  overflow-x: auto; padding: 4px 20px 16px;
+  scrollbar-width: none;
+}
+.recent-scroll::-webkit-scrollbar { display: none; }
+.rdna-card {
+  flex-shrink: 0; width: 128px; height: 192px;
+  border-radius: var(--radius-lg); overflow: hidden;
+  cursor: pointer; position: relative;
+  transition: transform 0.2s var(--spring), box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.rdna-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+.rdna-card:active { transform: scale(0.96); }
+.rdna-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center top;
+  background-color: var(--surface-2);
+}
+.rdna-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.82) 100%);
+}
+.rdna-body {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 10px 10px;
+}
+.rdna-type { font-family: var(--font-display); font-size: 0.92rem; font-style: italic; font-weight: 500; color: #fff; line-height: 1.15; margin-bottom: 6px; }
+.rdna-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.rdna-tag { font-family: var(--font-ui); font-size: 0.46rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(237,232,222,0.7); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); border-radius: 100px; padding: 2px 6px; backdrop-filter: blur(6px); }
+.rdna-badge {
+  position: absolute; top: 9px; right: 9px;
+  font-family: var(--font-ui); font-size: 0.68rem; font-weight: 800;
+  color: #fff; background: var(--accent);
+  border-radius: 100px; padding: 3px 7px;
+  box-shadow: 0 2px 8px rgba(204,95,53,0.5);
+  letter-spacing: 0.01em;
+}
+
+/* ── Skeleton shimmer ── */
+@keyframes shimmer {
+  0%{background-position:-400px 0} 100%{background-position:400px 0}
+}
+.skel {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
 @media (max-width: 430px) {
   .app { max-height: 100%; }
 }
@@ -457,12 +641,12 @@ body::after {
 <div class="app">
 
   <!-- ══════════════ HOME ══════════════ -->
-  <div class="screen active" id="screen-home">
+  <div class="screen" id="screen-home">
     <div class="sticky-nav">
       <div class="home-topbar">
         <div>
           <div class="greeting">Good morning ✦</div>
-          <span class="logo">StyleHits<span class="logo-dot"></span></span>
+          <span class="logo">StyleDNA<span class="logo-dot"></span></span>
         </div>
         <div style="display:flex;gap:8px">
           <div class="icon-btn">🔔</div>
@@ -471,7 +655,51 @@ body::after {
       </div>
     </div>
 
-    <div class="home-hero a1">
+    <!-- ── MVP Entry (first-run / no DNA yet) ── -->
+    <div class="mvp-entry a1" id="mvp-entry">
+      <div class="mvp-badge">Get Your Style DNA</div>
+      <div class="mvp-headline">Find your<br><em>Style DNA</em></div>
+      <div class="mvp-sub">Drop any outfit photo or paste an Instagram / Pinterest / product link. We'll decode your style and find your best-price matches.</div>
+
+      <!-- Quick input bar -->
+      <div class="quick-dna" id="quick-dna-bar">
+        <input
+          class="quick-dna-inp"
+          id="quick-url-inp"
+          type="text"
+          placeholder="Paste an Instagram, Pinterest or product link…"
+          onkeydown="if(event.key==='Enter') quickAnalyze()"
+        />
+        <div class="quick-dna-sep"></div>
+        <div class="quick-upload-btn" onclick="document.getElementById('file-input').click()" title="Upload photo">📷</div>
+        <button class="analyze-go" onclick="quickAnalyze()">
+          Analyze ✦
+        </button>
+      </div>
+
+      <!-- Thumbnail previews of uploaded quick photos -->
+      <div class="quick-upload-preview" id="quick-preview"></div>
+
+      <div class="or-divider">or choose input method</div>
+
+      <div class="quick-method-row">
+        <div class="qmethod-btn" onclick="switchTab('dna'); setTimeout(()=>setModeExternal('photos'),300)">
+          <span class="qmethod-icon">📸</span>
+          <span>Photos</span>
+        </div>
+        <div class="qmethod-btn" onclick="switchTab('dna'); setTimeout(()=>setModeExternal('pinterest'),300)">
+          <span class="qmethod-icon">📌</span>
+          <span>Pinterest</span>
+        </div>
+        <div class="qmethod-btn" onclick="switchTab('dna'); setTimeout(()=>setModeExternal('links'),300)">
+          <span class="qmethod-icon">🔗</span>
+          <span>Links</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Active DNA hero (shown after DNA is built) ── -->
+    <div class="home-hero" id="home-hero-active">
       <div class="hero-chip">Style DNA Active</div>
       <div class="hero-title">Your <em>Refined</em><br>Style Awaits</div>
       <div class="hero-sub">94 new matches based on your Style DNA — best prices found across 5 stores</div>
@@ -489,7 +717,7 @@ body::after {
 
     <div class="sec-row a3">
       <div>
-        <div class="section-chip" style="margin-bottom:4px">DNA Picks</div>
+        <div class="section-chip" style="margin-bottom:4px">Matching your Style DNA</div>
         <div class="display-head" style="font-size:1.08rem">Just for <em>you</em></div>
       </div>
       <button class="see-all" onclick="switchTab('discover')">See all</button>
@@ -500,12 +728,12 @@ body::after {
   </div>
 
   <!-- ══════════════ DNA INPUT ══════════════ -->
-  <div class="screen" id="screen-dna">
+  <div class="screen active" id="screen-dna">
     <div class="dna-loading" id="dna-loading">
       <div class="spin"></div>
       <div class="load-title">Building your<br><em>Style DNA</em></div>
       <div class="load-sub">Analyzing across 47 style dimensions...</div>
-      <div class="load-bar"><div class="load-fill"></div></div>
+      <div class="load-bar"><div class="load-fill" id="load-fill-bar"></div></div>
       <div class="load-status" id="load-status">Scanning visual inputs...</div>
     </div>
 
@@ -519,19 +747,21 @@ body::after {
       </div>
 
       <div class="method-tabs a4">
-        <div class="mtab sel" onclick="setMode('photos',this)">
+        <div class="mtab sel" id="mtab-photos" onclick="setMode('photos',this)">
           <span class="mtab-icon">📸</span><div class="mtab-label">Photos</div>
         </div>
-        <div class="mtab" onclick="setMode('pinterest',this)">
+        <div class="mtab" id="mtab-pinterest" onclick="setMode('pinterest',this)">
           <span class="mtab-icon">📌</span><div class="mtab-label">Pinterest</div>
         </div>
-        <div class="mtab" onclick="setMode('links',this)">
+        <div class="mtab" id="mtab-links" onclick="setMode('links',this)">
           <span class="mtab-icon">🔗</span><div class="mtab-label">Links</div>
         </div>
       </div>
 
       <div id="mode-photos">
-        <div class="drop-zone" onclick="addUploads()">
+        <!-- Hidden native file input -->
+        <input type="file" id="file-input" multiple accept="image/*" onchange="handleFileSelect(this)" />
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
           <span class="dz-icon">↑</span>
           <div class="dz-title">Drop photos or tap to browse</div>
           <div class="dz-sub">Outfits, inspo, your wardrobe — up to 20</div>
@@ -541,14 +771,15 @@ body::after {
 
       <div id="mode-pinterest" style="display:none;padding:0 20px">
         <div class="url-row" style="margin:0 0 8px">
-          <input type="text" class="url-inp" placeholder="pinterest.com/username/board-name" />
+          <input type="text" class="url-inp" id="pinterest-inp" placeholder="pinterest.com/username/board-name" />
           <button class="url-add" onclick="addUrl('Pinterest')">Import</button>
         </div>
+        <div class="added-tags" id="pinterest-tags"></div>
       </div>
 
       <div id="mode-links" style="display:none">
         <div class="url-row">
-          <input type="text" class="url-inp" placeholder="instagram.com/p/... or any product URL" />
+          <input type="text" class="url-inp" id="link-inp" placeholder="instagram.com/p/… or any product URL" />
           <button class="url-add" onclick="addUrl('Link')">Add</button>
         </div>
         <div class="added-tags" id="added-tags"></div>
@@ -559,7 +790,75 @@ body::after {
           <span>Decode My Style DNA</span><span>✦</span>
         </button>
       </div>
-      <div style="height:20px"></div>
+
+      <!-- ── Recent DNA searches ── -->
+      <div class="recent-dna-sec">
+        <div class="section-chip" style="margin:0 20px 12px">Recently Decoded</div>
+        <div class="recent-scroll">
+          <div class="rdna-card" onclick="switchTab('dna-result')">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-badge">94%</div>
+            <div class="rdna-body">
+              <div class="rdna-type">Quiet Luxury</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Earth Tones</span>
+                <span class="rdna-tag">Minimal</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-badge">88%</div>
+            <div class="rdna-body">
+              <div class="rdna-type">Urban Edge</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Streetwear</span>
+                <span class="rdna-tag">Dark Tones</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-badge">91%</div>
+            <div class="rdna-body">
+              <div class="rdna-type">Soft Minimalist</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Pastels</span>
+                <span class="rdna-tag">Clean Lines</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-badge">86%</div>
+            <div class="rdna-body">
+              <div class="rdna-type">Boho Luxe</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Textures</span>
+                <span class="rdna-tag">Warm Tones</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-badge">93%</div>
+            <div class="rdna-body">
+              <div class="rdna-type">Editorial Chic</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Bold</span>
+                <span class="rdna-tag">Avant-garde</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:28px"></div>
     </div>
   </div>
 
@@ -583,7 +882,12 @@ body::after {
       <div class="prof-bio">Clean silhouettes, elevated basics, unexpected details. Earth tones anchor your palette — with terracotta and sage as signature accents.</div>
     </div>
 
-    <div class="dims a2">
+    <div class="prof-actions a2" style="margin-bottom:20px">
+      <button class="btn-sec" onclick="switchTab('dna')">Refine</button>
+      <button class="btn-pri" onclick="showDNAMatches()"><span>Shop My Style</span><span>→</span></button>
+    </div>
+
+    <div class="dims a3">
       <div class="dim-lbl">Style Dimensions</div>
       <div class="dim-item">
         <div class="dim-head"><span class="dim-name">Formality</span><span class="dim-vals">Casual · 38%</span></div>
@@ -603,7 +907,7 @@ body::after {
       </div>
     </div>
 
-    <div class="palette-sec a3">
+    <div class="palette-sec a4">
       <div class="dim-lbl" style="margin-bottom:10px">Your Palette</div>
       <div class="palette-row">
         <div class="swatch" style="background:#2C2822" title="Espresso"></div>
@@ -616,7 +920,7 @@ body::after {
       </div>
     </div>
 
-    <div class="vtags-sec a4">
+    <div class="vtags-sec a5">
       <div class="dim-lbl" style="margin-bottom:10px">Style Vocabulary</div>
       <div class="vtags">
         <span class="vtag p">Quiet Luxury</span>
@@ -632,10 +936,6 @@ body::after {
       </div>
     </div>
 
-    <div class="prof-actions a5">
-      <button class="btn-sec" onclick="switchTab('dna')">Refine</button>
-      <button class="btn-pri" onclick="switchTab('discover')"><span>Shop My Style</span><span>→</span></button>
-    </div>
     <div style="height:20px"></div>
   </div>
 
@@ -662,7 +962,7 @@ body::after {
       </div>
     </div>
     <div class="disc-meta">
-      <div class="disc-meta-txt"><span>8 items</span> matched today</div>
+      <div class="disc-meta-txt"><span id="disc-count">…</span> items matched</div>
       <div class="disc-meta-txt">Prices from <span>5 stores</span></div>
     </div>
     <div class="pgrid" id="discover-grid"></div>
@@ -689,7 +989,7 @@ body::after {
 
   <!-- ══════════════ TAB BAR ══════════════ -->
   <div class="tab-bar">
-    <button class="tab-btn active" id="tab-home" onclick="switchTab('home')">
+    <button class="tab-btn" id="tab-home" onclick="switchTab('home')">
       <div class="tab-dot"></div>
       <span class="tab-icon">🏠</span>
       <span class="tab-label">Home</span>
@@ -699,7 +999,7 @@ body::after {
       <span class="tab-icon">✨</span>
       <span class="tab-label">Discover</span>
     </button>
-    <button class="tab-btn" id="tab-dna" onclick="switchTab('dna')">
+    <button class="tab-btn active" id="tab-dna" onclick="switchTab('dna')">
       <div class="tab-dot"></div>
       <span class="tab-icon">🧬</span>
       <span class="tab-label">Style DNA</span>
@@ -731,39 +1031,92 @@ body::after {
 </div><!-- .app -->
 
 <script>
-/* ── Data ── */
-const products = [
-  {id:1,brand:'Uniqlo',name:'Linen Relaxed Blazer',match:97,price:59.90,deal:true,
-   color:'linear-gradient(145deg,#2A2520,#3D3328)',
-   prices:[{r:'Uniqlo',icon:'🔵',p:59.90,best:true,save:21},{r:'ASOS',icon:'🟠',p:74.00},{r:'Amazon',icon:'🟡',p:81.50}]},
-  {id:2,brand:'ASOS',name:'Oversized Cotton Tee',match:94,price:18.00,deal:true,
-   color:'linear-gradient(145deg,#1E2A20,#2A3825)',
-   prices:[{r:'ASOS',icon:'🟠',p:18.00,best:true,save:8},{r:'H&M',icon:'🔴',p:22.99},{r:'Zara',icon:'⬛',p:25.95}]},
-  {id:3,brand:'Zara',name:'Wide Leg Tailored Trouser',match:91,price:45.95,deal:false,
-   color:'linear-gradient(145deg,#1E1C28,#2C2A3A)',
-   prices:[{r:'Zara',icon:'⬛',p:45.95,best:true,save:4},{r:'ASOS',icon:'🟠',p:52.00},{r:'H&M',icon:'🔴',p:49.99}]},
-  {id:4,brand:'H&M',name:'Oversized Camel Coat',match:89,price:79.99,deal:true,
-   color:'linear-gradient(145deg,#2A2018,#3A2D20)',
-   prices:[{r:'H&M',icon:'🔴',p:79.99,best:true,save:20},{r:'Zara',icon:'⬛',p:99.95},{r:'ASOS',icon:'🟠',p:94.00}]},
-  {id:5,brand:'COS',name:'Ribbed Merino Crewneck',match:88,price:85.00,deal:false,
-   color:'linear-gradient(145deg,#1E2220,#2C3228)',
-   prices:[{r:'COS',icon:'🟤',p:85.00,best:true,save:7},{r:'Amazon',icon:'🟡',p:92.00},{r:'ASOS',icon:'🟠',p:105.00}]},
-  {id:6,brand:'Uniqlo',name:'Heattech Turtleneck',match:86,price:19.90,deal:true,
-   color:'linear-gradient(145deg,#201A18,#2E2420)',
-   prices:[{r:'Uniqlo',icon:'🔵',p:19.90,best:true,save:5},{r:'H&M',icon:'🔴',p:24.99},{r:'Zara',icon:'⬛',p:27.95}]},
-  {id:7,brand:'ASOS',name:'Cargo Trousers Ecru',match:83,price:38.00,deal:false,
-   color:'linear-gradient(145deg,#26241C,#36321E)',
-   prices:[{r:'ASOS',icon:'🟠',p:38.00,best:true,save:12},{r:'Zara',icon:'⬛',p:49.95},{r:'H&M',icon:'🔴',p:44.99}]},
-  {id:8,brand:'Mango',name:'Leather Belt Bag',match:81,price:34.99,deal:true,
-   color:'linear-gradient(145deg,#22201A,#32302A)',
-   prices:[{r:'Mango',icon:'🟣',p:34.99,best:true,save:11},{r:'Zara',icon:'⬛',p:45.95},{r:'ASOS',icon:'🟠',p:40.00}]},
+/* ── Live product store ── */
+let products = [];
+
+/* ── DummyJSON fetch ── */
+const FASHION_CATS = ['tops','womens-dresses','womens-bags','sunglasses','mens-shirts'];
+const RETAILERS = [
+  {r:'ASOS',     icon:'🟠'}, {r:'Zara',    icon:'⬛'},
+  {r:'H&M',      icon:'🔴'}, {r:'Uniqlo',  icon:'🔵'},
+  {r:'Mango',    icon:'🟣'}, {r:'Amazon',  icon:'🟡'},
 ];
+const CAT_MATCH = {
+  'womens-dresses': [94,97], tops:[88,94],
+  'mens-shirts':[85,91], 'womens-bags':[80,87], sunglasses:[78,84],
+};
+const CAT_BRAND = {
+  'womens-dresses':'Zara','tops':'ASOS',
+  'mens-shirts':'Uniqlo','womens-bags':'Mango',sunglasses:'H&M',
+};
+
+function makePrices(basePrice) {
+  const shuffled = [...RETAILERS].sort(()=>Math.random()-0.5).slice(0,3);
+  const best = parseFloat(basePrice.toFixed(2));
+  const save = parseFloat((best * (0.1 + Math.random()*0.18)).toFixed(2));
+  return [
+    {r:shuffled[0].r, icon:shuffled[0].icon, p:best, best:true, save},
+    {r:shuffled[1].r, icon:shuffled[1].icon, p:parseFloat((best*1.12).toFixed(2))},
+    {r:shuffled[2].r, icon:shuffled[2].icon, p:parseFloat((best*1.22).toFixed(2))},
+  ];
+}
+
+function randBetween(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+async function fetchProducts() {
+  showSkeletons();
+  try {
+    const fetches = FASHION_CATS.map(cat =>
+      fetch(`https://dummyjson.com/products/category/${cat}?limit=4&select=id,title,price,thumbnail,category`)
+        .then(r=>r.json())
+    );
+    const results = await Promise.all(fetches);
+    products = results.flatMap((res, ci) => {
+      const cat = FASHION_CATS[ci];
+      const [lo, hi] = CAT_MATCH[cat];
+      return (res.products||[]).map(p => ({
+        id: p.id,
+        brand: CAT_BRAND[cat],
+        name: p.title,
+        match: randBetween(lo, hi),
+        price: parseFloat(p.price.toFixed(2)),
+        deal: Math.random() > 0.5,
+        img: p.thumbnail,
+        prices: makePrices(p.price),
+      }));
+    });
+    products.sort((a,b) => b.match - a.match);
+    renderGrid('home-grid', products.slice(0,4));
+    renderGrid('discover-grid', products);
+    document.getElementById('disc-count').textContent = products.length;
+  } catch(e) {
+    console.error('Product fetch failed:', e);
+    document.getElementById('home-grid').innerHTML = '<p style="color:var(--fg-muted);padding:20px;font-size:0.75rem">Could not load products. Check your connection.</p>';
+  }
+}
+
+/* ── Skeleton loader ── */
+function showSkeletons() {
+  const skel = `<div class="pcard" style="pointer-events:none">
+    <div class="pimg"><div class="pimg-bg skel"></div></div>
+    <div class="pinfo">
+      <div class="skel" style="height:8px;width:40%;border-radius:4px;margin-bottom:6px"></div>
+      <div class="skel" style="height:11px;width:80%;border-radius:4px;margin-bottom:10px"></div>
+      <div class="skel" style="height:10px;width:30%;border-radius:4px"></div>
+    </div>
+  </div>`;
+  document.getElementById('home-grid').innerHTML = skel.repeat(4);
+  document.getElementById('discover-grid').innerHTML = skel.repeat(8);
+}
 
 /* ── Render ── */
 function cardHTML(p) {
+  const imgContent = p.img
+    ? `<img src="${p.img}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" />`
+    : `<div class="pimg-bg" style="background:linear-gradient(145deg,#2A2520,#3D3328)"></div>`;
   return `<div class="pcard" onclick="openSheet(${p.id})">
     <div class="pimg">
-      <div class="pimg-bg" style="background:${p.color}"></div>
+      ${imgContent}
       <div class="match-badge">✦ ${p.match}%</div>
       <div class="save-btn" onclick="toggleSave(event,this)">♡</div>
     </div>
@@ -781,8 +1134,9 @@ function cardHTML(p) {
 function renderGrid(id, items) {
   document.getElementById(id).innerHTML = items.map(cardHTML).join('');
 }
-renderGrid('home-grid', products.slice(0,4));
-renderGrid('discover-grid', products);
+
+/* load on startup */
+fetchProducts();
 
 /* ── Price sheet ── */
 function openSheet(id) {
@@ -824,7 +1178,8 @@ const tabMap = {
   dna:'screen-dna', saved:'screen-saved', profile:'screen-profile',
   'dna-result':'screen-dna-result'
 };
-let activeTab = 'home';
+let activeTab = 'dna';
+let dnaBuilt = false;
 
 function switchTab(tab) {
   document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
@@ -839,6 +1194,66 @@ function switchTab(tab) {
   closeSheet();
 }
 
+/* ── Quick-entry from home (MVP path) ── */
+const quickGrads = [
+  'linear-gradient(135deg,#2A1F1A,#3D2515)',
+  'linear-gradient(135deg,#1A2018,#253020)',
+  'linear-gradient(135deg,#1E1C28,#2A2535)',
+  'linear-gradient(135deg,#26201A,#3A2D22)',
+];
+let qIdx = 0;
+
+function quickAnalyze() {
+  const url = document.getElementById('quick-url-inp').value.trim();
+  if (!url && document.getElementById('quick-preview').children.length === 0) {
+    /* if nothing entered, jump to full DNA screen */
+    switchTab('dna');
+    return;
+  }
+  startAnalysis();
+}
+
+/* ── File input handler ── */
+function handleFileSelect(input) {
+  const files = Array.from(input.files).slice(0, 20);
+  if (!files.length) return;
+
+  const isQuick = (activeTab === 'home');
+  if (isQuick) {
+    const preview = document.getElementById('quick-preview');
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'quick-thumb';
+        thumb.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover" />
+          <div class="qthumb-rm" onclick="this.parentElement.remove()">✕</div>`;
+        preview.appendChild(thumb);
+      };
+      reader.readAsDataURL(file);
+    });
+  } else {
+    /* DNA screen upload grid */
+    const grid = document.getElementById('ugrid');
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const el = document.createElement('div');
+        el.className = 'uthumb';
+        el.innerHTML = `<img src="${e.target.result}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+          <div class="uthumb-rm" onclick="this.parentElement.remove()">✕</div>`;
+        grid.appendChild(el);
+      };
+      reader.readAsDataURL(file);
+    });
+    /* update drop zone appearance */
+    const dz = document.getElementById('drop-zone');
+    dz.classList.add('has-photos');
+    dz.innerHTML = `<button class="dz-add-more" onclick="document.getElementById('file-input').click()">+ Add more photos</button>`;
+  }
+  input.value = '';
+}
+
 /* ── DNA input modes ── */
 function setMode(mode, el) {
   document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('sel'));
@@ -848,46 +1263,78 @@ function setMode(mode, el) {
   document.getElementById('mode-links').style.display = mode==='links'?'block':'none';
 }
 
-const grads = [
-  'linear-gradient(135deg,#2A1F1A,#3D2515)',
-  'linear-gradient(135deg,#1A2018,#253020)',
-  'linear-gradient(135deg,#1E1C28,#2A2535)',
-  'linear-gradient(135deg,#26201A,#3A2D22)',
-  'linear-gradient(135deg,#1F2420,#2E3828)',
-];
-let uidx=0;
-function addUploads() {
-  const g = document.getElementById('ugrid');
-  for(let i=0;i<3;i++){
-    const el = document.createElement('div');
-    el.className='uthumb';
-    el.innerHTML=`<div style="position:absolute;inset:0;background:${grads[uidx%grads.length]}"></div>
-      <div class="uthumb-rm" onclick="this.parentElement.remove()">✕</div>`;
-    g.appendChild(el); uidx++;
-  }
+function setModeExternal(mode) {
+  const idMap = { photos:'mtab-photos', pinterest:'mtab-pinterest', links:'mtab-links' };
+  const el = document.getElementById(idMap[mode]);
+  if(el) setMode(mode, el);
 }
 
-let urlCnt=0;
+let urlCnt = 0;
 function addUrl(type) {
   urlCnt++;
-  const c=document.getElementById('added-tags');
-  const t=document.createElement('div'); t.className='atag';
-  t.innerHTML=`${type==='Pinterest'?'📌':'🔗'} ${type} ${urlCnt} <span onclick="this.parentElement.remove()" style="cursor:pointer;opacity:0.5;margin-left:2px">✕</span>`;
+  const inputId = type === 'Pinterest' ? 'pinterest-inp' : 'link-inp';
+  const containerId = type === 'Pinterest' ? 'pinterest-tags' : 'added-tags';
+  const inp = document.getElementById(inputId);
+  const val = inp ? inp.value.trim() : '';
+  const label = val || `${type} ${urlCnt}`;
+  inp && (inp.value = '');
+  const c = document.getElementById(containerId);
+  const t = document.createElement('div');
+  t.className = 'atag';
+  t.innerHTML = `${type==='Pinterest'?'📌':'🔗'} ${label} <span onclick="this.parentElement.remove()" style="cursor:pointer;opacity:0.5;margin-left:2px">✕</span>`;
   c.appendChild(t);
 }
 
 /* ── Analysis animation ── */
-const statuses=['Scanning visual inputs...','Extracting color signatures...','Mapping style dimensions...','Identifying aesthetic patterns...','Calibrating 47 style axes...','Building your DNA profile...'];
+const statuses = [
+  'Scanning visual inputs…',
+  'Extracting color signatures…',
+  'Mapping style dimensions…',
+  'Identifying aesthetic patterns…',
+  'Calibrating 47 style axes…',
+  'Building your DNA profile…'
+];
+
 function startAnalysis() {
-  const form=document.getElementById('dna-form');
-  const loading=document.getElementById('dna-loading');
-  form.style.display='none'; loading.classList.add('show');
-  let i=0; const el=document.getElementById('load-status');
-  const iv=setInterval(()=>{ if(i<statuses.length) el.textContent=statuses[i++]; else clearInterval(iv); },460);
+  const form = document.getElementById('dna-form');
+  const loading = document.getElementById('dna-loading');
+
+  /* Switch to DNA tab so loading is visible */
+  document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
+  const sc = document.getElementById('screen-dna');
+  setTimeout(()=>{ sc.classList.add('active'); sc.scrollTop=0; }, 50);
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-dna').classList.add('active');
+
+  form.style.display = 'none';
+  loading.classList.add('show');
+
+  /* Reset progress bar */
+  const fill = document.getElementById('load-fill-bar');
+  if(fill) { fill.style.animation='none'; void fill.offsetWidth; fill.style.animation=''; }
+
+  let i = 0;
+  const el = document.getElementById('load-status');
+  const iv = setInterval(()=>{
+    if(i < statuses.length) el.textContent = statuses[i++];
+    else clearInterval(iv);
+  }, 460);
+
   setTimeout(()=>{
-    clearInterval(iv); loading.classList.remove('show'); form.style.display='block';
+    clearInterval(iv);
+    loading.classList.remove('show');
+    form.style.display = 'block';
+    dnaBuilt = true;
+    /* Swap home hero to "active DNA" state */
+    document.getElementById('mvp-entry').style.display = 'none';
+    document.getElementById('home-hero-active').classList.add('visible');
     switchTab('dna-result');
-  },3000);
+  }, 3000);
+}
+
+/* ── Show discover after DNA result ── */
+function showDNAMatches() {
+  switchTab('discover');
 }
 
 /* ── Filter chips ── */

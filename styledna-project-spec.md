@@ -1,10 +1,10 @@
-# Project spec for StyleHits
+# Project spec for StyleDNA
 
 ---
 
 ## Project goals
 
-StyleHits is an AI-powered personal style app that identifies a user's unique **Style DNA** — their aesthetic, preferences, and taste — and then surfaces shoppable product recommendations that match that style at the **lowest available price** across retailers.
+StyleDNA is an AI-powered personal style app that identifies a user's unique **Style DNA** — their aesthetic, preferences, and taste — and then surfaces shoppable product recommendations that match that style at the **lowest available price** across retailers.
 
 The core value proposition: *understand who you are style-wise, then find the exact look (or closest match) for the best deal.*
 
@@ -106,7 +106,7 @@ The core value proposition: *understand who you are style-wise, then find the ex
 - **Interactions**: Smooth, satisfying micro-animations. Swipe to like/dislike on style inputs. Tap to expand price comparison.
 - **Mobile-first**: Every screen designed for a phone screen first, even on web.
 
-**Brand name**: StyleHits — implies discovering style moments, hitting on the right look.
+**Brand name**: StyleDNA — implies discovering style moments, hitting on the right look.
 
 ---
 
@@ -219,7 +219,7 @@ feed_items: user_id, product_id, match_score, shown_at
 | Tier | Price | Features |
 |---|---|---|
 | Free | $0 | 10 recommendations/week, basic Style DNA, affiliate links |
-| StyleHits Pro | ~$7.99/mo or $59.99/yr | Unlimited recs, price drop alerts, style refresh, deal score |
+| StyleDNA Pro | ~$7.99/mo or $59.99/yr | Unlimited recs, price drop alerts, style refresh, deal score |
 
 ### Affiliate strategy
 - Prioritize retailers with the best commission rates and product coverage
@@ -264,4 +264,4 @@ feed_items: user_id, product_id, match_score, shown_at
 ---
 
 *Last updated: 2026-03-15 — generated from founder interview session*
-*This document is the single source of truth for the StyleHits MVP build.*
+*This document is the single source of truth for the StyleDNA MVP build.*
