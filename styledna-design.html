@@ -1042,58 +1042,26 @@ body::after {
 let products = [];
 
 /* ── DummyJSON fetch ── */
-const FASHION_CATS = ['tops','mens-shirts','mens-shoes','womens-shoes','sunglasses','mens-watches'];
-const RETAILERS = [
-  {r:'ASOS',     icon:'🟠'}, {r:'Zara',    icon:'⬛'},
-  {r:'H&M',      icon:'🔴'}, {r:'Uniqlo',  icon:'🔵'},
-  {r:'Mango',    icon:'🟣'}, {r:'Amazon',  icon:'🟡'},
-];
-const CAT_MATCH = {
-  'tops':[88,94], 'mens-shirts':[85,92],
-  'mens-shoes':[82,90], 'womens-shoes':[84,91],
-  'sunglasses':[78,86], 'mens-watches':[75,83],
-};
-const CAT_BRAND = {
-  'tops':'ASOS', 'mens-shirts':'Uniqlo',
-  'mens-shoes':'Zara', 'womens-shoes':'Mango',
-  'sunglasses':'H&M', 'mens-watches':'Amazon',
-};
-
-function makePrices(basePrice) {
-  const shuffled = [...RETAILERS].sort(()=>Math.random()-0.5).slice(0,3);
-  const best = parseFloat(basePrice.toFixed(2));
-  const save = parseFloat((best * (0.1 + Math.random()*0.18)).toFixed(2));
-  return [
-    {r:shuffled[0].r, icon:shuffled[0].icon, p:best, best:true, save},
-    {r:shuffled[1].r, icon:shuffled[1].icon, p:parseFloat((best*1.12).toFixed(2))},
-    {r:shuffled[2].r, icon:shuffled[2].icon, p:parseFloat((best*1.22).toFixed(2))},
-  ];
-}
-
 function randBetween(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
 
 async function fetchProducts() {
   showSkeletons();
   try {
-    const fetches = FASHION_CATS.map(cat =>
-      fetch(`https://dummyjson.com/products/category/${cat}?limit=4&select=id,title,price,thumbnail,category`)
-        .then(r=>r.json())
-    );
-    const results = await Promise.all(fetches);
-    products = results.flatMap((res, ci) => {
-      const cat = FASHION_CATS[ci];
-      const [lo, hi] = CAT_MATCH[cat];
-      return (res.products||[]).map(p => ({
-        id: p.id,
-        brand: CAT_BRAND[cat],
-        name: p.title,
-        match: randBetween(lo, hi),
-        price: parseFloat(p.price.toFixed(2)),
-        deal: Math.random() > 0.5,
-        img: p.thumbnail,
-        prices: makePrices(p.price),
-      }));
-    });
+    const r = await fetch('/api/products?style=default');
+    if (!r.ok) throw new Error('API error ' + r.status);
+    const data = await r.json();
+
+    products = (data.products || []).map(p => ({
+      id:    p.id,
+      brand: p.brand,
+      name:  p.name,
+      match: p.match,
+      price: parseFloat(p.price.toFixed(2)),
+      deal:  p.price < 50,
+      img:   p.img,
+      url:   p.url,
+    }));
+
     products.sort((a,b) => b.match - a.match);
     renderGrid('home-grid', products.slice(0,4));
     renderGrid('discover-grid', products);
@@ -1134,7 +1102,7 @@ function cardHTML(p) {
       <div class="pname">${p.name}</div>
       <div class="pprice-row">
         <div class="pprice${p.deal?' deal':''}">$${p.price.toFixed(2)}</div>
-        <a class="pstores" href="https://google.com/shopping/product/1?q=${encodeURIComponent(p.name)}" target="_blank" onclick="event.stopPropagation()" style="text-decoration:none">Best price →</a>
+        <a class="pstores" href="${p.url||'#'}" target="_blank" onclick="event.stopPropagation()" style="text-decoration:none">Shop →</a>
       </div>
     </div>
   </div>`;
