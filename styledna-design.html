@@ -1075,14 +1075,6 @@ body::after {
         <div class="added-tags" id="added-tags"></div>
       </div>
 
-      <div class="gender-row a5">
-        <div class="gender-label">Shop for</div>
-        <div class="gender-opts">
-          <button class="gender-btn active" data-g="women" onclick="setGender(this)">Women</button>
-          <button class="gender-btn" data-g="men" onclick="setGender(this)">Men</button>
-          <button class="gender-btn" data-g="all" onclick="setGender(this)">Everyone</button>
-        </div>
-      </div>
 
       <div class="analyze-wrap">
         <button class="analyze-btn" onclick="startAnalysis()">
@@ -1772,9 +1764,28 @@ const statuses = [
   'Building your DNA profile…'
 ];
 
+/* ── Auto-detect gender from link keywords ── */
+function detectGenderFromInput() {
+  const urls = [
+    document.getElementById('pinterest-inp')?.value || '',
+    document.getElementById('link-inp')?.value || '',
+    document.getElementById('quick-url-inp')?.value || '',
+  ].join(' ').toLowerCase();
+
+  const menKeywords = /\b(men|mens|man|male|him|his|boy|boys|sir|groom|bro|guy|guys|menswear|mensfashion)\b/;
+  const womenKeywords = /\b(women|womens|woman|female|her|she|girl|girls|lady|ladies|womenswear|womensfashion|dress|dresses|skirt)\b/;
+
+  if (menKeywords.test(urls) && !womenKeywords.test(urls)) return 'men';
+  if (womenKeywords.test(urls) && !menKeywords.test(urls)) return 'women';
+  return 'everyone'; // ambiguous or no link — show mixed
+}
+
 function startAnalysis() {
   const form = document.getElementById('dna-form');
   const loading = document.getElementById('dna-loading');
+
+  /* Auto-detect gender from any pasted links */
+  userGender = detectGenderFromInput();
 
   /* Switch to DNA tab so loading is visible */
   document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
