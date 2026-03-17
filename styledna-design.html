@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>StyleDNA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0C0B09;
+  --surface: #161410;
+  --surface-2: #201E1A;
+  --surface-3: #2A2822;
+  --border: rgba(237,232,222,0.08);
+  --border-strong: rgba(237,232,222,0.14);
+  --fg: #EDE8DE;
+  --fg-muted: #7A7268;
+  --fg-dim: #4A4640;
+  --accent: #CC5F35;
+  --accent-light: #E07A50;
+  --accent-glow: rgba(204,95,53,0.14);
+  --green: #7E9B73;
+  --green-bg: rgba(126,155,115,0.12);
+  --tan: #C4A47C;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --tab-h: 80px;
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100%; height: 100%;
+  background: #1A1816;
+  color: var(--fg);
+  overflow: hidden;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.025; pointer-events: none; z-index: 9998;
+}
+
+/* ── App shell ── */
+.app {
+  width: 100%; max-width: 430px;
+  height: 100%; max-height: 932px;
+  margin: 0 auto;
+  position: relative; overflow: hidden;
+  background: var(--bg);
+  box-shadow: 0 0 80px rgba(0,0,0,0.8);
+}
+
+/* ── Screens ── */
+.screen {
+  position: absolute; top: 0; left: 0; right: 0;
+  bottom: var(--tab-h);
+  overflow-y: auto; overflow-x: hidden;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s var(--ease-out), transform 0.3s var(--ease-out);
+  transform: translateY(10px);
+  -webkit-overflow-scrolling: touch;
+}
+.screen::-webkit-scrollbar { display: none; }
+.screen.active { opacity: 1; pointer-events: all; transform: translateY(0); }
+
+/* ── Tab bar ── */
+.tab-bar {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: var(--tab-h);
+  background: rgba(18,16,13,0.96);
+  backdrop-filter: blur(24px) saturate(180%);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: flex-start; padding-top: 10px;
+  z-index: 500;
+}
+.tab-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+  cursor: pointer; padding: 6px 4px;
+  background: none; border: none; position: relative;
+  transition: transform 0.15s var(--spring);
+  -webkit-tap-highlight-color: transparent;
+}
+.tab-btn:active { transform: scale(0.86); }
+.tab-icon { font-size: 1.2rem; line-height: 1; transition: all 0.25s var(--ease-out); filter: grayscale(1) brightness(0.45); }
+.tab-btn.active .tab-icon { filter: none; transform: scale(1.1); }
+.tab-label { font-family: var(--font-ui); font-size: 0.56rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-dim); transition: color 0.2s; }
+.tab-btn.active .tab-label { color: var(--accent); }
+.tab-dot { position: absolute; top: 4px; width: 3px; height: 3px; border-radius: 50%; background: var(--accent); opacity: 0; transition: opacity 0.2s; }
+.tab-btn.active .tab-dot { opacity: 1; }
+
+/* ── Shared ── */
+.sticky-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(12,11,9,0.92);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+}
+.section-chip {
+  font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
+  display: flex; align-items: center; gap: 6px;
+}
+.section-chip::before { content: ''; width: 16px; height: 1.5px; background: var(--accent); }
+.display-head { font-family: var(--font-display); font-weight: 400; line-height: 1.1; color: var(--fg); }
+.display-head em { font-style: italic; color: var(--tan); }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface-2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.88rem; cursor: pointer;
+  transition: transform 0.15s var(--spring);
+}
+.icon-btn:active { transform: scale(0.88); }
+
+/* ───────────────────────────────────────────
+   SCREEN 1 — HOME (with MVP DNA entry)
+─────────────────────────────────────────── */
+.home-topbar {
+  padding: 52px 20px 14px;
+  display: flex; align-items: flex-end; justify-content: space-between;
+}
+.logo { font-family: var(--font-display); font-size: 1.55rem; font-weight: 600; letter-spacing: 0.02em; }
+.logo-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); margin-left: 2px; vertical-align: super; }
+.greeting { font-family: var(--font-body); font-size: 0.72rem; font-weight: 300; color: var(--fg-muted); margin-bottom: 2px; }
+
+/* ── MVP Entry Card (first-run state) ── */
+.mvp-entry {
+  margin: 12px 20px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 22px;
+  position: relative; overflow: hidden;
+}
+.mvp-entry::before {
+  content: ''; position: absolute; top: -60px; right: -60px;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(204,95,53,0.12) 0%, transparent 68%);
+  pointer-events: none;
+}
+.mvp-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--accent-glow); border: 1px solid rgba(204,95,53,0.22);
+  border-radius: 100px; padding: 4px 11px;
+  font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-light);
+  margin-bottom: 10px;
+}
+.mvp-badge::before { content: '✦'; font-size: 0.48rem; }
+.mvp-headline {
+  font-family: var(--font-display); font-size: 1.68rem; font-weight: 400;
+  line-height: 1.12; margin-bottom: 6px;
+}
+.mvp-headline em { font-style: italic; color: var(--tan); }
+.mvp-sub {
+  font-size: 0.74rem; font-weight: 300; color: var(--fg-muted);
+  line-height: 1.5; margin-bottom: 18px; max-width: 230px;
+}
+
+/* ── Quick DNA input (the MVP) ── */
+.quick-dna {
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 5px 5px 5px 14px;
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.quick-dna:focus-within {
+  border-color: rgba(204,95,53,0.4);
+  box-shadow: 0 0 0 3px rgba(204,95,53,0.07);
+}
+.quick-dna-inp {
+  flex: 1; background: none; border: none; outline: none;
+  font-family: var(--font-body); font-size: 0.78rem; font-weight: 300;
+  color: var(--fg); min-width: 0;
+}
+.quick-dna-inp::placeholder { color: var(--fg-dim); }
+.quick-dna-sep {
+  width: 1px; height: 22px; background: var(--border-strong); flex-shrink: 0;
+}
+.quick-upload-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+  background: var(--surface-3); border: 1px solid var(--border);
+  font-size: 1rem; cursor: pointer; transition: transform 0.15s var(--spring);
+}
+.quick-upload-btn:active { transform: scale(0.88); }
+.quick-upload-preview {
+  display: flex; align-items: center; gap: 5px; overflow-x: auto;
+  scrollbar-width: none; padding: 2px 0;
+}
+.quick-upload-preview::-webkit-scrollbar { display: none; }
+.quick-thumb {
+  width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+  animation: popIn 0.28s var(--spring) both;
+}
+.qthumb-rm {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.55);
+  display: none; align-items: center; justify-content: center;
+  font-size: 0.5rem; color: white; cursor: pointer;
+}
+.quick-thumb:hover .qthumb-rm { display: flex; }
+.analyze-go {
+  background: var(--accent); border: none;
+  border-radius: 10px; padding: 10px 14px; flex-shrink: 0;
+  font-family: var(--font-ui); font-size: 0.62rem; font-weight: 700;
+  color: white; letter-spacing: 0.07em; text-transform: uppercase;
+  cursor: pointer; display: flex; align-items: center; gap: 5px;
+  transition: transform 0.15s var(--spring);
+  white-space: nowrap;
+}
+.analyze-go:active { transform: scale(0.92); }
+
+.or-divider {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ui); font-size: 0.56rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-dim);
+  margin-bottom: 12px;
+}
+.or-divider::before, .or-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.quick-method-row {
+  display: flex; gap: 8px;
+}
+.qmethod-btn {
+  flex: 1; background: var(--surface-3); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 10px 8px;
+  font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--fg-muted);
+  cursor: pointer; text-align: center; transition: all 0.18s var(--ease-out);
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.qmethod-btn:hover { border-color: rgba(204,95,53,0.3); color: var(--accent-light); background: var(--accent-glow); }
+.qmethod-btn:active { transform: scale(0.95); }
+.qmethod-icon { font-size: 1.1rem; }
+
+/* ── Active DNA hero (after DNA exists) ── */
+.home-hero {
+  display: none;
+  margin: 12px 20px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 22px;
+  position: relative; overflow: hidden;
+}
+.home-hero.visible { display: block; }
+.home-hero::before {
+  content: ''; position: absolute; top: -50px; right: -50px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(204,95,53,0.1) 0%, transparent 70%);
+}
+.hero-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--accent-glow); border: 1px solid rgba(204,95,53,0.22);
+  border-radius: 100px; padding: 4px 11px;
+  font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-light);
+  margin-bottom: 10px;
+}
+.hero-chip::before { content: '✦'; font-size: 0.48rem; }
+.hero-title { font-family: var(--font-display); font-size: 1.75rem; font-weight: 400; line-height: 1.1; margin-bottom: 7px; }
+.hero-title em { font-style: italic; color: var(--tan); }
+.hero-sub { font-size: 0.75rem; font-weight: 300; color: var(--fg-muted); line-height: 1.5; margin-bottom: 18px; max-width: 220px; }
+.hero-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--accent); color: white;
+  font-family: var(--font-ui); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 10px 18px; border-radius: 100px; border: none; cursor: pointer;
+  transition: transform 0.15s var(--spring);
+}
+.hero-btn:active { transform: scale(0.95); }
+
+.tags-scroll {
+  display: flex; gap: 7px; overflow-x: auto; padding: 16px 20px 0;
+  scrollbar-width: none;
+}
+.tags-scroll::-webkit-scrollbar { display: none; }
+.tag-pill {
+  flex-shrink: 0; font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 13px;
+  border-radius: 100px; border: 1px solid var(--border); color: var(--fg-muted);
+  background: var(--surface); white-space: nowrap; cursor: pointer; transition: all 0.2s;
+}
+.tag-pill.active { background: var(--accent-glow); border-color: rgba(204,95,53,0.28); color: var(--accent-light); }
+
+.sec-row { padding: 18px 20px 12px; display: flex; align-items: flex-end; justify-content: space-between; }
+.see-all { font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: none; border: none; cursor: pointer; }
+
+/* Product card */
+.pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; }
+.pcard {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden; cursor: pointer;
+  transition: transform 0.2s var(--spring), box-shadow 0.2s;
+}
+.pcard:active { transform: scale(0.97); }
+.pimg { width: 100%; aspect-ratio: 2/3; position: relative; overflow: hidden; }
+.pimg-bg { position: absolute; inset: 0; transition: transform 0.5s var(--ease-out); }
+.pcard:hover .pimg-bg { transform: scale(1.04); }
+.match-badge {
+  position: absolute; top: 9px; left: 9px;
+  font-family: var(--font-ui); font-size: 0.54rem; font-weight: 800;
+  color: var(--green); background: var(--green-bg); border: 1px solid rgba(126,155,115,0.22);
+  padding: 3px 7px; border-radius: 100px; letter-spacing: 0.08em;
+}
+.save-btn {
+  position: absolute; top: 9px; right: 9px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(12,11,9,0.65); backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 0.72rem;
+  cursor: pointer; transition: transform 0.15s var(--spring);
+}
+.save-btn:active { transform: scale(1.35); }
+.save-btn.saved { color: var(--accent); }
+.pinfo { padding: 10px 11px 13px; }
+.pbrand { font-family: var(--font-ui); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-dim); margin-bottom: 3px; }
+.pname { font-family: var(--font-display); font-size: 0.88rem; font-weight: 500; color: var(--fg); line-height: 1.2; margin-bottom: 8px; }
+.pprice-row { display: flex; align-items: center; justify-content: space-between; }
+.pprice { font-family: var(--font-ui); font-size: 0.85rem; font-weight: 800; color: var(--fg); }
+.pprice.deal { color: var(--accent); }
+.pstores { font-family: var(--font-ui); font-size: 0.54rem; font-weight: 600; color: var(--fg-dim); letter-spacing: 0.04em; }
+
+/* ───────────────────────────────────────────
+   SCREEN 2 — STYLE DNA INPUT
+─────────────────────────────────────────── */
+.dna-topbar { padding: 52px 20px 18px; }
+.method-tabs { display: flex; gap: 8px; margin: 0 20px 20px; }
+.mtab {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 15px 10px;
+  cursor: pointer; text-align: center; transition: all 0.22s var(--ease-out);
+  position: relative; overflow: hidden;
+}
+.mtab.sel { border-color: rgba(204,95,53,0.38); background: var(--surface-2); }
+.mtab.sel::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% -10%, rgba(204,95,53,0.08), transparent 70%);
+}
+.mtab-icon { font-size: 1.25rem; display: block; margin-bottom: 5px; }
+.mtab-label { font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted); }
+.mtab.sel .mtab-label { color: var(--accent-light); }
+
+.drop-zone {
+  margin: 0 20px 14px;
+  background: var(--surface); border: 1.5px dashed var(--border-strong);
+  border-radius: var(--radius-xl); padding: 38px 20px; text-align: center;
+  cursor: pointer; transition: all 0.2s;
+  position: relative;
+}
+.drop-zone:active { transform: scale(0.99); background: var(--surface-2); }
+.drop-zone.has-photos { padding: 18px 20px; border-style: solid; border-color: rgba(204,95,53,0.25); background: var(--surface-2); }
+.dz-icon { font-size: 1.8rem; display: block; margin-bottom: 11px; }
+.dz-title { font-family: var(--font-ui); font-size: 0.75rem; font-weight: 700; color: var(--fg); margin-bottom: 4px; letter-spacing: 0.03em; }
+.dz-sub { font-size: 0.7rem; font-weight: 300; color: var(--fg-muted); }
+.dz-add-more {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--accent);
+  background: none; border: 1px solid rgba(204,95,53,0.25);
+  border-radius: 100px; padding: 5px 12px; cursor: pointer;
+  transition: transform 0.15s var(--spring);
+}
+.dz-add-more:active { transform: scale(0.92); }
+
+/* Hidden file input */
+#file-input { display: none; }
+
+.ugrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 0 20px 14px; }
+.uthumb {
+  aspect-ratio: 1; border-radius: var(--radius-md); overflow: hidden;
+  position: relative; border: 1px solid var(--border);
+  animation: popIn 0.3s var(--spring) forwards;
+}
+@keyframes popIn { from { opacity: 0; transform: scale(0.55); } to { opacity: 1; transform: scale(1); } }
+.uthumb-rm {
+  position: absolute; top: 4px; right: 4px; width: 15px; height: 15px;
+  background: rgba(0,0,0,0.72); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.48rem; color: white; cursor: pointer;
+}
+
+.url-row { display: flex; gap: 8px; margin: 0 20px 8px; }
+.url-inp {
+  flex: 1; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-md); padding: 13px 15px;
+  font-family: var(--font-body); font-size: 0.8rem; font-weight: 300;
+  color: var(--fg); outline: none; transition: border-color 0.2s;
+}
+.url-inp::placeholder { color: var(--fg-dim); }
+.url-inp:focus { border-color: rgba(204,95,53,0.38); }
+.url-add {
+  background: var(--surface-2); border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md); padding: 13px 16px;
+  font-family: var(--font-ui); font-size: 0.65rem; font-weight: 700;
+  color: var(--fg); letter-spacing: 0.06em; cursor: pointer;
+  transition: transform 0.15s var(--spring);
+}
+.url-add:active { transform: scale(0.93); }
+
+.added-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 20px; margin-bottom: 14px; }
+.atag {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 100px;
+  padding: 5px 11px; font-family: var(--font-ui); font-size: 0.58rem; font-weight: 600;
+  color: var(--fg-muted); animation: popIn 0.3s var(--spring) forwards;
+}
+
+.analyze-wrap { padding: 18px 20px 6px; }
+.analyze-btn {
+  width: 100%; background: var(--accent); border: none;
+  border-radius: var(--radius-lg); padding: 16px;
+  font-family: var(--font-ui); font-size: 0.72rem; font-weight: 700;
+  color: white; letter-spacing: 0.1em; text-transform: uppercase;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
+  transition: transform 0.15s var(--spring);
+}
+.analyze-btn:active { transform: scale(0.98); }
+
+/* Loading */
+.dna-loading {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 20px; text-align: center;
+}
+.dna-loading.show { display: flex; }
+.spin {
+  width: 44px; height: 44px; border: 2px solid var(--surface-2);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin 0.75s linear infinite; margin-bottom: 22px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.load-title { font-family: var(--font-display); font-size: 1.55rem; font-weight: 400; margin-bottom: 6px; }
+.load-title em { font-style: italic; color: var(--tan); }
+.load-sub { font-size: 0.78rem; font-weight: 300; color: var(--fg-muted); margin-bottom: 28px; }
+.load-bar { width: 180px; height: 2px; background: var(--surface-2); border-radius: 1px; overflow: hidden; margin-bottom: 11px; }
+.load-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--tan)); animation: loadFill 2.9s var(--ease-out) forwards; }
+@keyframes loadFill { 0%{width:0%} 30%{width:27%} 65%{width:64%} 90%{width:87%} 100%{width:100%} }
+.load-status { font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-dim); animation: blink 0.45s ease-in-out infinite alternate; }
+@keyframes blink { from{opacity:0.45} to{opacity:1} }
+
+/* ───────────────────────────────────────────
+   SCREEN 3 — DNA PROFILE
+─────────────────────────────────────────── */
+.prof-header {
+  padding: 52px 20px 20px;
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  margin-bottom: 12px;
+}
+.prof-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.prof-type { font-family: var(--font-display); font-size: 1.75rem; font-weight: 400; line-height: 1.1; }
+.prof-type em { font-style: italic; color: var(--tan); }
+.conf-ring { width: 64px; height: 64px; flex-shrink: 0; position: relative; }
+.conf-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring-bg { fill: none; stroke: var(--surface-2); stroke-width: 3; }
+.ring-fill { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 170; stroke-dashoffset: 11; }
+.conf-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.conf-val { font-family: var(--font-ui); font-size: 1rem; font-weight: 800; color: var(--accent); line-height: 1; }
+.conf-lbl { font-family: var(--font-ui); font-size: 0.4rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-dim); }
+.prof-bio { font-size: 0.78rem; font-weight: 300; color: var(--fg-muted); line-height: 1.6; }
+
+.dims { padding: 0 20px; margin-bottom: 18px; }
+.dim-lbl { font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 12px; }
+.dim-item { margin-bottom: 13px; }
+.dim-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.dim-name { font-family: var(--font-ui); font-size: 0.68rem; font-weight: 700; color: var(--fg); }
+.dim-vals { font-family: var(--font-ui); font-size: 0.56rem; font-weight: 600; color: var(--fg-dim); letter-spacing: 0.04em; }
+.dim-track { height: 4px; background: var(--surface-2); border-radius: 2px; overflow: hidden; }
+.dim-fill { height: 100%; border-radius: 2px; animation: barIn 1.4s var(--ease-out) both; }
+@keyframes barIn { from{transform:scaleX(0);transform-origin:left} to{transform:scaleX(1);transform-origin:left} }
+
+.palette-sec { padding: 0 20px; margin-bottom: 18px; }
+.palette-row { display: flex; gap: 5px; }
+.swatch { flex: 1; height: 38px; border-radius: var(--radius-sm); cursor: pointer; transition: transform 0.15s var(--spring); }
+.swatch:active { transform: scale(0.9) translateY(-3px); }
+
+.vtags-sec { padding: 0 20px; margin-bottom: 22px; }
+.vtags { display: flex; flex-wrap: wrap; gap: 6px; }
+.vtag { font-family: var(--font-ui); font-size: 0.62rem; font-weight: 600; letter-spacing: 0.05em; padding: 6px 12px; border-radius: 100px; border: 1px solid var(--border); color: var(--fg-muted); background: var(--surface); }
+.vtag.p { color: var(--accent-light); background: var(--accent-glow); border-color: rgba(204,95,53,0.22); }
+.vtag.s { color: var(--green); background: var(--green-bg); border-color: rgba(126,155,115,0.22); }
+
+.prof-actions { padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 9px; }
+.btn-sec { background: var(--surface-2); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 14px; font-family: var(--font-ui); font-size: 0.65rem; font-weight: 700; color: var(--fg-muted); letter-spacing: 0.05em; cursor: pointer; text-align: center; transition: transform 0.15s var(--spring); }
+.btn-sec:active { transform: scale(0.96); }
+.btn-pri { background: var(--accent); border: none; border-radius: var(--radius-lg); padding: 14px; font-family: var(--font-ui); font-size: 0.65rem; font-weight: 700; color: white; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform 0.15s var(--spring); }
+.btn-pri:active { transform: scale(0.97); }
+
+/* ───────────────────────────────────────────
+   SCREEN 4 — DISCOVER
+─────────────────────────────────────────── */
+.disc-top { padding: 52px 20px 0; }
+.disc-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 12px; }
+.filter-bar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.fchip {
+  flex-shrink: 0; font-family: var(--font-ui); font-size: 0.6rem; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; padding: 7px 13px;
+  border-radius: 100px; cursor: pointer; border: 1px solid var(--border);
+  background: transparent; color: var(--fg-muted); white-space: nowrap;
+  transition: all 0.18s var(--spring);
+}
+.fchip.active { background: var(--accent); border-color: var(--accent); color: white; }
+.fchip:active { transform: scale(0.92); }
+
+.disc-meta { padding: 10px 20px 14px; display: flex; justify-content: space-between; align-items: center; }
+.disc-meta-txt { font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-dim); }
+.disc-meta-txt span { color: var(--green); }
+
+/* ── Bottom Sheet ── */
+.backdrop {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.62);
+  backdrop-filter: blur(4px); z-index: 600;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.backdrop.open { opacity: 1; pointer-events: all; }
+.sheet {
+  position: absolute; bottom: var(--tab-h); left: 0; right: 0;
+  background: var(--surface); border-top: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0; z-index: 700;
+  transform: translateY(100%); transition: transform 0.4s var(--ease-out);
+  padding: 0 0 28px;
+}
+.sheet.open { transform: translateY(0); }
+.handle { width: 34px; height: 4px; background: var(--surface-3); border-radius: 2px; margin: 14px auto 20px; }
+.sheet-name { font-family: var(--font-display); font-size: 1.18rem; font-weight: 400; color: var(--fg); margin-bottom: 3px; }
+.sheet-sub { font-family: var(--font-ui); font-size: 0.58rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 18px; }
+.price-rows { display: flex; flex-direction: column; gap: 7px; margin-bottom: 18px; }
+.price-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-md);
+  padding: 12px 15px; cursor: pointer; transition: transform 0.15s var(--spring);
+}
+.price-row:active { transform: scale(0.98); }
+.price-row.best { background: rgba(204,95,53,0.05); border-color: rgba(204,95,53,0.28); }
+.pr-left { display: flex; align-items: center; gap: 10px; }
+.pr-logo { width: 28px; height: 28px; border-radius: 6px; background: var(--surface-3); display: flex; align-items: center; justify-content: center; font-size: 0.68rem; }
+.pr-retailer { font-family: var(--font-ui); font-size: 0.72rem; font-weight: 700; color: var(--fg); }
+.pr-best-lbl { font-family: var(--font-ui); font-size: 0.5rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+.pr-right { text-align: right; }
+.pr-price { font-family: var(--font-ui); font-size: 0.95rem; font-weight: 800; }
+.pr-price.best { color: var(--accent); }
+.pr-price.hi { color: var(--fg-muted); }
+.pr-save { font-family: var(--font-ui); font-size: 0.52rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--green); }
+.buy-btn {
+  width: 100%; background: var(--accent); border: none; border-radius: var(--radius-lg); padding: 15px;
+  font-family: var(--font-ui); font-size: 0.72rem; font-weight: 700; color: white;
+  letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform 0.15s var(--spring);
+}
+.buy-btn:active { transform: scale(0.98); }
+
+/* ── Gender toggle ── */
+.gender-row { display: flex; align-items: center; gap: 12px; padding: 0 20px 4px; }
+.gender-label { font-family: var(--font-ui); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--fg-muted); flex-shrink: 0; }
+.gender-opts { display: flex; gap: 6px; }
+.gender-btn { font-family: var(--font-ui); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.04em; padding: 6px 14px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface-2); color: var(--fg-muted); cursor: pointer; transition: all 0.18s; -webkit-tap-highlight-color: transparent; }
+.gender-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── Style preview sheet ── */
+.ssheet-head { padding: 0 20px 18px; }
+.ssheet-chip { display: inline-block; font-family: var(--font-ui); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); background: var(--accent-glow); border: 1px solid rgba(204,95,53,0.22); border-radius: 100px; padding: 4px 10px; margin-bottom: 8px; }
+.ssheet-title { font-family: var(--font-display); font-size: 1.65rem; font-style: italic; font-weight: 400; color: var(--fg); line-height: 1.1; margin-bottom: 10px; }
+.ssheet-desc { font-size: 0.82rem; font-weight: 300; color: var(--fg-muted); line-height: 1.6; }
+.ssheet-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 4px 20px 0; }
+.ssheet-img { width: 100%; aspect-ratio: 3/4; border-radius: var(--radius-md); object-fit: cover; background: var(--surface-2); display: block; }
+.ssheet-img:first-child { grid-column: span 2; aspect-ratio: 16/9; }
+
+/* ── Placeholder screens ── */
+.ph-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 20px; }
+.ph-icon { font-size: 2.8rem; margin-bottom: 14px; }
+.ph-title { font-family: var(--font-display); font-size: 1.35rem; font-weight: 400; margin-bottom: 7px; }
+.ph-sub { font-size: 0.8rem; font-weight: 300; color: var(--fg-muted); max-width: 220px; line-height: 1.5; }
+
+/* ── Staggered entrance ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.a1{animation:fadeUp 0.5s var(--ease-out) 0.05s both}
+.a2{animation:fadeUp 0.5s var(--ease-out) 0.12s both}
+.a3{animation:fadeUp 0.5s var(--ease-out) 0.2s both}
+.a4{animation:fadeUp 0.5s var(--ease-out) 0.28s both}
+.a5{animation:fadeUp 0.5s var(--ease-out) 0.36s both}
+
+/* ── Recent DNA slider ── */
+.recent-dna-sec { padding-top: 22px; }
+.recent-scroll {
+  display: flex; gap: 10px;
+  overflow-x: auto; padding: 4px 20px 16px;
+  scrollbar-width: none;
+}
+.recent-scroll::-webkit-scrollbar { display: none; }
+.rdna-card {
+  flex-shrink: 0; width: 128px; height: 192px;
+  border-radius: var(--radius-lg); overflow: hidden;
+  cursor: pointer; position: relative;
+  transition: transform 0.2s var(--spring), box-shadow 0.2s;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.rdna-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+.rdna-card:active { transform: scale(0.96); }
+.rdna-img {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center top;
+  background-color: var(--surface-2);
+}
+.rdna-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.82) 100%);
+}
+.rdna-body {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 10px 10px 10px;
+}
+.rdna-type { font-family: var(--font-display); font-size: 0.92rem; font-style: italic; font-weight: 500; color: #fff; line-height: 1.15; margin-bottom: 6px; }
+.rdna-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.rdna-tag { font-family: var(--font-ui); font-size: 0.46rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: rgba(237,232,222,0.7); background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.14); border-radius: 100px; padding: 2px 6px; backdrop-filter: blur(6px); }
+.rdna-badge {
+  position: absolute; top: 9px; right: 9px;
+  font-family: var(--font-ui); font-size: 0.68rem; font-weight: 800;
+  color: #fff; background: var(--accent);
+  border-radius: 100px; padding: 3px 7px;
+  box-shadow: 0 2px 8px rgba(204,95,53,0.5);
+  letter-spacing: 0.01em;
+}
+
+/* ── Skeleton shimmer ── */
+@keyframes shimmer {
+  0%{background-position:-400px 0} 100%{background-position:400px 0}
+}
+.skel {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+@media (max-width: 430px) {
+  .app { max-height: 100%; }
+}
+
+/* ── Results screen header ── */
+.res-header {
+  padding: 20px 20px 0;
+}
+.res-style-name {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--fg);
+  margin-bottom: 8px;
+}
+.res-bio {
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.res-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.res-conf-chip {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--accent-glow);
+  color: var(--accent-light);
+  border: 1px solid rgba(204,95,53,0.25);
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.res-palette {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.res-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(237,232,222,0.1);
+  flex-shrink: 0;
+}
+.res-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.res-tag {
+  font-family: var(--font-ui);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+/* ── Look scroll ── */
+.look-scroll-wrap {
+  padding: 0 0 0 20px;
+}
+.look-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 20px;
+  padding-bottom: 4px;
+}
+.look-scroll::-webkit-scrollbar { display: none; }
+.look-card {
+  flex-shrink: 0;
+  width: 78vw;
+  max-width: 320px;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  scroll-snap-align: start;
+  position: relative;
+  background: var(--surface-2);
+}
+.look-card--placeholder { background: var(--surface-2); }
+.look-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.look-cat-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: var(--font-ui);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(12,11,9,0.75);
+  color: var(--fg);
+  padding: 4px 10px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(237,232,222,0.12);
+}
+.look-label-scrim {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(to top, rgba(12,11,9,0.85) 0%, transparent 100%);
+  display: flex;
+  align-items: flex-end;
+  padding: 14px;
+}
+.look-style-label {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  font-weight: 300;
+  color: var(--fg);
+}
+.look-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 14px 0 20px;
+}
+.look-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transition: background 0.25s, transform 0.25s;
+}
+.look-dot.active {
+  background: var(--accent);
+  transform: scale(1.3);
+}
+
+/* ── Results actions ── */
+.res-actions {
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Soon badge on tab buttons ── */
+.tab-btn.soon {
+  opacity: 0.5;
+  position: relative;
+}
+.tab-btn.soon::after {
+  content: 'Soon';
+  position: absolute;
+  top: 4px; right: 6px;
+  font-size: 8px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: var(--accent);
+  color: #fff;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+/* ── Waitlist screen ── */
+.waitlist-bg {
+  position: absolute; inset: 0; z-index: 0;
+  background: url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=60') center/cover;
+  filter: brightness(0.18);
+}
+.waitlist-content {
+  position: relative; z-index: 1;
+  padding: 60px 24px 40px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.waitlist-sub {
+  font-size: 0.9rem;
+  color: var(--fg-muted);
+  line-height: 1.6;
+  margin-bottom: 32px;
+  max-width: 300px;
+}
+.waitlist-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.waitlist-input {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.waitlist-input:focus { border-color: var(--accent); }
+.waitlist-input::placeholder { color: var(--fg-dim); }
+.waitlist-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.waitlist-tick {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; color: #fff;
+}
+.waitlist-success-txt {
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+.waitlist-back {
+  background: none; border: none; cursor: pointer;
+  color: var(--fg-muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 0;
+  margin-top: auto;
+  padding-top: 24px;
+}
+.waitlist-back:hover { color: var(--fg); }
+
+/* ── Share toast ── */
+.share-toast {
+  position: absolute;
+  bottom: calc(var(--tab-h) + 16px);
+  left: 50%; transform: translateX(-50%) translateY(8px);
+  background: var(--surface-3);
+  border: 1px solid var(--border-strong);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  padding: 10px 20px;
+  border-radius: 20px;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+  z-index: 800;
+  white-space: nowrap;
+}
+.share-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══════════════ HOME ══════════════ -->
+  <div class="screen" id="screen-home">
+    <div class="sticky-nav">
+      <div class="home-topbar">
+        <div>
+          <div class="greeting">Good morning ✦</div>
+          <span class="logo">StyleDNA<span class="logo-dot"></span></span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="icon-btn">🔔</div>
+          <div class="icon-btn">⚙️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MVP Entry (first-run / no DNA yet) ── -->
+    <div class="mvp-entry a1" id="mvp-entry">
+      <div class="mvp-badge">Get Your Style DNA</div>
+      <div class="mvp-headline">Find your<br><em>Style DNA</em></div>
+      <div class="mvp-sub">Drop any outfit photo or paste an Instagram / Pinterest / product link. We'll decode your style and find your best-price matches.</div>
+
+      <!-- Quick input bar -->
+      <div class="quick-dna" id="quick-dna-bar">
+        <input
+          class="quick-dna-inp"
+          id="quick-url-inp"
+          type="text"
+          placeholder="Paste an Instagram, Pinterest or product link…"
+          onkeydown="if(event.key==='Enter') quickAnalyze()"
+        />
+        <div class="quick-dna-sep"></div>
+        <div class="quick-upload-btn" onclick="document.getElementById('file-input').click()" title="Upload photo">📷</div>
+        <button class="analyze-go" onclick="quickAnalyze()">
+          Analyze ✦
+        </button>
+      </div>
+
+      <!-- Thumbnail previews of uploaded quick photos -->
+      <div class="quick-upload-preview" id="quick-preview"></div>
+
+      <div class="or-divider">or choose input method</div>
+
+      <div class="quick-method-row">
+        <div class="qmethod-btn" onclick="switchTab('dna'); setTimeout(()=>setModeExternal('photos'),300)">
+          <span class="qmethod-icon">📸</span>
+          <span>Photos</span>
+        </div>
+        <div class="qmethod-btn" onclick="switchTab('dna'); setTimeout(()=>setModeExternal('pinterest'),300)">
+          <span class="qmethod-icon">📌</span>
+          <span>Pinterest</span>
+        </div>
+        <div class="qmethod-btn" onclick="switchTab('dna'); setTimeout(()=>setModeExternal('links'),300)">
+          <span class="qmethod-icon">🔗</span>
+          <span>Links</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Active DNA hero (shown after DNA is built) ── -->
+    <div class="home-hero" id="home-hero-active">
+      <div class="hero-chip">Style DNA Active</div>
+      <div class="hero-title">Your <em>Refined</em><br>Style Awaits</div>
+      <div class="hero-sub">94 new matches based on your Style DNA — best prices found across 5 stores</div>
+      <button class="hero-btn" onclick="switchTab('discover')">Shop Matches →</button>
+    </div>
+
+    <div class="tags-scroll a2">
+      <div class="tag-pill active">All</div>
+      <div class="tag-pill">Quiet Luxury</div>
+      <div class="tag-pill">Earth Tones</div>
+      <div class="tag-pill">Minimal</div>
+      <div class="tag-pill">Streetwear</div>
+      <div class="tag-pill">On Sale</div>
+    </div>
+
+    <div class="sec-row a3">
+      <div>
+        <div class="section-chip" style="margin-bottom:4px">Matching your Style DNA</div>
+        <div class="display-head" style="font-size:1.08rem">Just for <em>you</em></div>
+      </div>
+      <button class="see-all" onclick="switchTab('discover')">See all</button>
+    </div>
+
+    <div class="pgrid a4" id="home-grid"></div>
+    <div style="height:20px"></div>
+  </div>
+
+  <!-- ══════════════ DNA INPUT ══════════════ -->
+  <div class="screen active" id="screen-dna">
+    <div class="dna-loading" id="dna-loading">
+      <div class="spin"></div>
+      <div class="load-title">Building your<br><em>Style DNA</em></div>
+      <div class="load-sub">Analyzing across 47 style dimensions...</div>
+      <div class="load-bar"><div class="load-fill" id="load-fill-bar"></div></div>
+      <div class="load-status" id="load-status">Scanning visual inputs...</div>
+    </div>
+
+    <div id="dna-form">
+      <div class="sticky-nav">
+        <div class="dna-topbar">
+          <div class="section-chip a1" style="margin-bottom:8px">Style DNA</div>
+          <div class="display-head a2" style="font-size:1.75rem">Show us<br>what you <em>love</em></div>
+          <div style="font-size:0.76rem;font-weight:300;color:var(--fg-muted);margin-top:7px;line-height:1.5" class="a3">More inputs = sharper match and better deals.</div>
+        </div>
+      </div>
+
+      <div class="method-tabs a4">
+        <div class="mtab sel" id="mtab-photos" onclick="setMode('photos',this)">
+          <span class="mtab-icon">📸</span><div class="mtab-label">Photos</div>
+        </div>
+        <div class="mtab" id="mtab-pinterest" onclick="setMode('pinterest',this)">
+          <span class="mtab-icon">📌</span><div class="mtab-label">Pinterest</div>
+        </div>
+        <div class="mtab" id="mtab-links" onclick="setMode('links',this)">
+          <span class="mtab-icon">🔗</span><div class="mtab-label">Links</div>
+        </div>
+      </div>
+
+      <div id="mode-photos">
+        <!-- Hidden native file input -->
+        <input type="file" id="file-input" multiple accept="image/*" onchange="handleFileSelect(this)" />
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+          <span class="dz-icon">↑</span>
+          <div class="dz-title">Drop photos or tap to browse</div>
+          <div class="dz-sub">Outfits, inspo, your wardrobe — up to 20</div>
+        </div>
+        <div class="ugrid" id="ugrid"></div>
+      </div>
+
+      <div id="mode-pinterest" style="display:none;padding:0 20px">
+        <div class="url-row" style="margin:0 0 8px">
+          <input type="text" class="url-inp" id="pinterest-inp" placeholder="pinterest.com/username/board-name" />
+          <button class="url-add" onclick="addUrl('Pinterest')">Import</button>
+        </div>
+        <div class="added-tags" id="pinterest-tags"></div>
+      </div>
+
+      <div id="mode-links" style="display:none">
+        <div class="url-row">
+          <input type="text" class="url-inp" id="link-inp" placeholder="instagram.com/p/… or any product URL" />
+          <button class="url-add" onclick="addUrl('Link')">Add</button>
+        </div>
+        <div class="added-tags" id="added-tags"></div>
+      </div>
+
+
+      <div class="analyze-wrap">
+        <button class="analyze-btn" onclick="startAnalysis()">
+          <span>Decode My Style DNA</span><span>✦</span>
+        </button>
+      </div>
+
+      <!-- ── Recent DNA searches ── -->
+      <div class="recent-dna-sec">
+        <div class="section-chip" style="margin:0 20px 12px">Recently Decoded</div>
+        <div class="recent-scroll">
+          <div class="rdna-card" onclick="openStyleSheet('quiet-luxury')">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-body">
+              <div class="rdna-type">Quiet Luxury</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Earth Tones</span>
+                <span class="rdna-tag">Minimal</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card" onclick="openStyleSheet('urban-edge')">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-body">
+              <div class="rdna-type">Urban Edge</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Streetwear</span>
+                <span class="rdna-tag">Dark Tones</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card" onclick="openStyleSheet('soft-minimalist')">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-body">
+              <div class="rdna-type">Soft Minimalist</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Pastels</span>
+                <span class="rdna-tag">Clean Lines</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card" onclick="openStyleSheet('boho-luxe')">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-body">
+              <div class="rdna-type">Boho Luxe</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Textures</span>
+                <span class="rdna-tag">Warm Tones</span>
+              </div>
+            </div>
+          </div>
+          <div class="rdna-card" onclick="openStyleSheet('editorial-chic')">
+            <div class="rdna-img" style="background-image:url('https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=256&h=384&fit=crop&q=80')"></div>
+            <div class="rdna-gradient"></div>
+            <div class="rdna-body">
+              <div class="rdna-type">Editorial Chic</div>
+              <div class="rdna-tags">
+                <span class="rdna-tag">Bold</span>
+                <span class="rdna-tag">Avant-garde</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="height:28px"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ DNA PROFILE ══════════════ -->
+  <!-- ══════════════ DNA RESULT ══════════════ -->
+  <div class="screen" id="screen-dna-result">
+
+    <!-- Compact header -->
+    <div class="res-header">
+      <div class="section-chip" style="margin-bottom:10px">Your Style DNA</div>
+      <div class="res-style-name" id="res-style-name">Quiet Luxury</div>
+      <div class="res-bio" id="res-bio">Understated elegance. Quality over logos.</div>
+      <div class="res-meta-row">
+        <div class="res-conf-chip">94% match</div>
+        <div class="res-palette" id="res-palette">
+          <div class="res-swatch" style="background:#2C2822"></div>
+          <div class="res-swatch" style="background:#C4A47C"></div>
+          <div class="res-swatch" style="background:#7E9B73"></div>
+          <div class="res-swatch" style="background:#E8E0D0"></div>
+          <div class="res-swatch" style="background:#CC5F35"></div>
+        </div>
+      </div>
+      <div class="res-tags" id="res-tags">
+        <span class="res-tag">Clean Lines</span>
+        <span class="res-tag">Earth Tones</span>
+        <span class="res-tag">Minimal</span>
+      </div>
+    </div>
+
+    <!-- Horizontal look scroll -->
+    <div class="look-scroll-wrap">
+      <div class="look-scroll" id="look-scroll">
+        <div class="look-card look-card--placeholder"></div>
+        <div class="look-card look-card--placeholder"></div>
+        <div class="look-card look-card--placeholder"></div>
+        <div class="look-card look-card--placeholder"></div>
+      </div>
+      <div class="look-dots" id="look-dots">
+        <div class="look-dot active"></div>
+        <div class="look-dot"></div>
+        <div class="look-dot"></div>
+        <div class="look-dot"></div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="res-actions">
+      <button class="btn-pri" onclick="shareStyle()">
+        <span>Share My Style DNA</span><span>↗</span>
+      </button>
+      <button class="btn-sec" onclick="switchTab('dna')">Decode Again</button>
+    </div>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <!-- ══════════════ DISCOVER ══════════════ -->
+  <div class="screen" id="screen-discover">
+    <div class="sticky-nav">
+      <div class="disc-top">
+        <div class="disc-header">
+          <div>
+            <div class="section-chip" style="margin-bottom:4px">94% DNA Match</div>
+            <div class="display-head" style="font-size:1.25rem">Matched for <em>you</em></div>
+          </div>
+          <div class="icon-btn">🔍</div>
+        </div>
+        <div class="filter-bar">
+          <div class="fchip active" onclick="setFilter(this)">All</div>
+          <div class="fchip" onclick="setFilter(this)">Tops</div>
+          <div class="fchip" onclick="setFilter(this)">Bottoms</div>
+          <div class="fchip" onclick="setFilter(this)">Outerwear</div>
+          <div class="fchip" onclick="setFilter(this)">Accessories</div>
+          <div class="fchip" onclick="setFilter(this)">On Sale</div>
+          <div class="fchip" onclick="setFilter(this)">Under $50</div>
+        </div>
+      </div>
+    </div>
+    <div class="disc-meta">
+      <div class="disc-meta-txt"><span id="disc-count">…</span> items matched</div>
+      <div class="disc-meta-txt">Prices from <span>5 stores</span></div>
+    </div>
+    <div class="pgrid" id="discover-grid"></div>
+    <div style="height:20px"></div>
+  </div>
+
+  <!-- ══════════════ SAVED ══════════════ -->
+  <div class="screen ph-screen" id="screen-saved">
+    <div style="height:52px"></div>
+    <div class="ph-icon">♡</div>
+    <div class="ph-title">Your <em style="font-style:italic;color:var(--tan)">Wishlist</em></div>
+    <div class="ph-sub">Save items you love and get notified when prices drop.</div>
+    <button class="btn-pri" style="margin-top:22px;width:auto;padding:12px 24px" onclick="switchTab('discover')">Browse Deals →</button>
+  </div>
+
+  <!-- ══════════════ PROFILE ══════════════ -->
+  <div class="screen ph-screen" id="screen-profile">
+    <div style="height:52px"></div>
+    <div class="ph-icon">👤</div>
+    <div class="ph-title"><em style="font-style:italic;color:var(--tan)">Your Profile</em></div>
+    <div class="ph-sub">94% DNA Confidence · 0 saves · Joined today</div>
+    <button class="btn-sec" style="margin-top:18px;padding:12px 22px" onclick="switchTab('dna')">Update Style DNA</button>
+  </div>
+
+  <!-- ══════════════ WAITLIST ══════════════ -->
+  <div class="screen" id="screen-waitlist">
+    <div class="waitlist-bg"></div>
+    <div class="waitlist-content">
+      <div class="section-chip" style="margin-bottom:16px">Coming Soon</div>
+      <div class="display-head" style="font-size:1.7rem;margin-bottom:12px">
+        Get deals matched to<br><em>your Style DNA</em>
+      </div>
+      <p class="waitlist-sub">We're building personalised shopping across 500+ stores. Be first.</p>
+      <div class="waitlist-form" id="waitlist-form">
+        <input
+          type="email"
+          id="waitlist-email"
+          class="waitlist-input"
+          placeholder="your@email.com"
+          autocomplete="email"
+        />
+        <button class="btn-pri" onclick="joinWaitlist()">Join the Waitlist</button>
+      </div>
+      <div class="waitlist-success" id="waitlist-success" style="display:none">
+        <div class="waitlist-tick">✓</div>
+        <div class="waitlist-success-txt">You're on the list</div>
+      </div>
+      <button class="waitlist-back" onclick="switchTab(hasDecode ? 'dna-result' : 'dna')">
+        ← Back to your Style DNA
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════ TAB BAR ══════════════ -->
+  <div class="tab-bar">
+    <button class="tab-btn soon" id="tab-home" onclick="switchTab('home')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">Home</span>
+    </button>
+    <button class="tab-btn soon" id="tab-discover" onclick="switchTab('discover')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">✨</span>
+      <span class="tab-label">Discover</span>
+    </button>
+    <button class="tab-btn active" id="tab-dna" onclick="switchTab(hasDecode ? 'dna-result' : 'dna')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">🧬</span>
+      <span class="tab-label">Style DNA</span>
+    </button>
+    <button class="tab-btn soon" id="tab-saved" onclick="switchTab('saved')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">♡</span>
+      <span class="tab-label">Saved</span>
+    </button>
+    <button class="tab-btn soon" id="tab-profile" onclick="switchTab('profile')">
+      <div class="tab-dot"></div>
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">Profile</span>
+    </button>
+  </div>
+
+  <!-- Sheet backdrop -->
+  <div class="backdrop" id="backdrop" onclick="closeStyleSheet()"></div>
+
+  <!-- Style preview sheet (Recently Decoded) -->
+  <div class="sheet" id="style-sheet" style="bottom:0;max-height:92%;overflow-y:auto;z-index:750">
+    <div class="handle"></div>
+    <div class="ssheet-head">
+      <div class="ssheet-chip" id="ssheet-chip">Style DNA</div>
+      <div class="ssheet-title" id="ssheet-title">Quiet Luxury</div>
+      <div class="ssheet-desc" id="ssheet-desc"></div>
+    </div>
+    <div class="ssheet-grid" id="ssheet-grid"></div>
+    <button class="buy-btn" style="margin:16px 20px 0;width:calc(100% - 40px)" onclick="closeStyleSheet()">Decode My Own DNA ✦</button>
+  </div>
+
+</div><!-- .app -->
+
+<script>
+/* ── Live product store ── */
+let products = [];
+
+/* ── DummyJSON fetch ── */
+function randBetween(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+
+async function fetchProducts() {
+  showSkeletons();
+  try {
+    const r = await fetch(`/api/products?style=default&gender=${userGender}`);
+    if (!r.ok) throw new Error('API error ' + r.status);
+    const data = await r.json();
+
+    products = (data.products || []).map(p => ({
+      id:    p.id,
+      brand: p.brand,
+      name:  p.name,
+      match: p.match,
+      price: parseFloat(p.price.toFixed(2)),
+      deal:  p.price < 50,
+      img:   p.img,
+      url:   p.url,
+    }));
+
+    products.sort((a,b) => b.match - a.match);
+    renderGrid('home-grid', products.slice(0,4));
+    renderGrid('discover-grid', products);
+    document.getElementById('disc-count').textContent = products.length;
+  } catch(e) {
+    console.error('Product fetch failed:', e);
+    document.getElementById('home-grid').innerHTML = '<p style="color:var(--fg-muted);padding:20px;font-size:0.75rem">Could not load products. Check your connection.</p>';
+  }
+}
+
+/* ── Skeleton loader ── */
+function showSkeletons() {
+  const skel = `<div class="pcard" style="pointer-events:none">
+    <div class="pimg"><div class="pimg-bg skel"></div></div>
+    <div class="pinfo">
+      <div class="skel" style="height:8px;width:40%;border-radius:4px;margin-bottom:6px"></div>
+      <div class="skel" style="height:11px;width:80%;border-radius:4px;margin-bottom:10px"></div>
+      <div class="skel" style="height:10px;width:30%;border-radius:4px"></div>
+    </div>
+  </div>`;
+  document.getElementById('home-grid').innerHTML = skel.repeat(4);
+  document.getElementById('discover-grid').innerHTML = skel.repeat(8);
+}
+
+/* ── Render ── */
+function cardHTML(p) {
+  const imgContent = p.img
+    ? `<img src="${p.img}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy" />`
+    : `<div class="pimg-bg" style="background:linear-gradient(145deg,#2A2520,#3D3328)"></div>`;
+  return `<div class="pcard">
+    <div class="pimg">
+      ${imgContent}
+      <div class="match-badge">✦ ${p.match}%</div>
+      <div class="save-btn" onclick="toggleSave(event,this)">♡</div>
+    </div>
+    <div class="pinfo">
+      <div class="pbrand">${p.brand}</div>
+      <div class="pname">${p.name}</div>
+      <div class="pprice-row">
+        <div class="pprice${p.deal?' deal':''}">$${p.price.toFixed(2)}</div>
+        <a class="pstores" href="${p.url||'#'}" target="_blank" onclick="event.stopPropagation()" style="text-decoration:none">Shop →</a>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGrid(id, items) {
+  document.getElementById(id).innerHTML = items.map(cardHTML).join('');
+}
+
+/* load on startup */
+fetchProducts();
+
+/* ── Style preview data ── */
+const STYLE_DATA = {
+  'quiet-luxury': {
+    label: 'Quiet Luxury',
+    bio: 'Understated elegance. Quality over logos.',
+    tags: ['Clean Lines', 'Earth Tones', 'Minimal'],
+    palette: ['#2C2822','#C4A47C','#7E9B73','#E8E0D0','#CC5F35'],
+    women: {
+      top:       'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1594938298603-c8148c4b4357?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1584917865442-de89be371e60?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1594938298603-c8148c4b4357?w=400&h=533&fit=crop&q=80'],
+    },
+    men: {
+      top:       'https://images.unsplash.com/photo-1617137968427-85924c800a22?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1617137968427-85924c800a22?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=533&fit=crop&q=80'],
+    },
+  },
+  'urban-edge': {
+    label: 'Urban Edge',
+    bio: 'Streetwear with a sharp city attitude.',
+    tags: ['Dark Tones', 'Streetwear', 'Graphic'],
+    palette: ['#1A1A1A','#3D3D3D','#CC5F35','#E8E0D0','#7A7268'],
+    women: {
+      top:       'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1571513722275-4b41940f54b8?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1571513722275-4b41940f54b8?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&h=533&fit=crop&q=80'],
+    },
+    men: {
+      top:       'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1488161628813-04466f872be2?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1488161628813-04466f872be2?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&h=533&fit=crop&q=80'],
+    },
+  },
+  'soft-minimalist': {
+    label: 'Soft Minimalist',
+    bio: 'Calm, airy, effortless. Nothing extra.',
+    tags: ['Pastels', 'Clean Lines', 'Airy'],
+    palette: ['#F5F0E8','#DDD5C5','#B8C5B0','#9AABB0','#7A8A7A'],
+    women: {
+      top:       'https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1581044777550-4cfa60707c03?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1548624313-0396c75e4b1a?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=400&h=533&fit=crop&q=80'],
+    },
+    men: {
+      top:       'https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1584999734482-0361aecad844?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1584999734482-0361aecad844?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1621072156002-e2fccdc0b176?w=400&h=533&fit=crop&q=80'],
+    },
+  },
+  'boho-luxe': {
+    label: 'Boho Luxe',
+    bio: 'Warm textures, layered artisan beauty.',
+    tags: ['Earth Tones', 'Layered', 'Artisan'],
+    palette: ['#8B6B3D','#C4956A','#7E9B73','#D4A96A','#3D2B1F'],
+    women: {
+      top:       'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1485968579580-b6d095142e6e?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1517441169886-9d6a7ffd5fac?w=400&h=533&fit=crop&q=80'],
+    },
+    men: {
+      top:       'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1513956589380-bad6acb9b9d4?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=533&fit=crop&q=80'],
+    },
+  },
+  'editorial-chic': {
+    label: 'Editorial Chic',
+    bio: 'Fashion as art. Every street a runway.',
+    tags: ['Bold Cuts', 'Statement', 'Avant-garde'],
+    palette: ['#1A1A2E','#E94560','#0F3460','#E8E0D0','#C4A47C'],
+    women: {
+      top:       'https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1475180429745-7f68d7692c6b?w=400&h=533&fit=crop&q=80'],
+    },
+    men: {
+      top:       'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=600&h=750&fit=crop&q=80',
+      bottom:    'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=600&h=750&fit=crop&q=80',
+      shoes:     'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=600&h=750&fit=crop&q=80',
+      accessory: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=600&h=750&fit=crop&q=80',
+      sheet:     ['https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=533&fit=crop&q=80','https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=533&fit=crop&q=80'],
+    },
+  },
+};
+
+/* ── Style sheet (Recently Decoded) ── */
+function openStyleSheet(key) {
+  const s = STYLE_DATA[key];
+  if (!s) return;
+  const gd = userGender === 'men' ? s.men : s.women;
+  const imgs = gd.sheet;
+  document.getElementById('ssheet-chip').textContent = 'Style DNA';
+  document.getElementById('ssheet-title').textContent = s.label;
+  document.getElementById('ssheet-desc').textContent = s.bio;
+  document.getElementById('ssheet-grid').innerHTML = imgs.map(src =>
+    `<img class="ssheet-img" src="${src}" alt="${s.label}" loading="lazy" />`
+  ).join('');
+  document.getElementById('style-sheet').scrollTop = 0;
+  document.getElementById('backdrop').classList.add('open');
+  document.getElementById('style-sheet').classList.add('open');
+}
+function closeStyleSheet() {
+  document.getElementById('backdrop').classList.remove('open');
+  document.getElementById('style-sheet').classList.remove('open');
+}
+
+/* ── Save toggle ── */
+function toggleSave(e,btn) {
+  e.stopPropagation();
+  btn.classList.toggle('saved');
+  btn.textContent = btn.classList.contains('saved') ? '♥' : '♡';
+}
+
+/* ── Tab navigation ── */
+const tabMap = {
+  home:        'screen-waitlist',
+  discover:    'screen-waitlist',
+  dna:         'screen-dna',
+  saved:       'screen-waitlist',
+  profile:     'screen-waitlist',
+  'dna-result':'screen-dna-result',
+  waitlist:    'screen-waitlist',
+};
+const SOON_TABS = new Set(['home','discover','saved','profile']);
+let activeTab = 'dna';
+let dnaBuilt = false;
+let hasDecode = false;
+let currentStyle = null;
+let userGender = 'women';
+
+function getImgs(s) {
+  if (userGender === 'men') return s.men;
+  if (userGender === 'women') return s.women;
+  // 'everyone': fixed mixed mapping
+  return { top: s.women.top, bottom: s.men.bottom, shoes: s.women.shoes, accessory: s.men.accessory };
+}
+
+const STYLE_KEYS = Object.keys(STYLE_DATA);
+
+function setGender(btn) {
+  userGender = btn.dataset.g;
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  fetchProducts(); // reload with new gender
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
+  const screenId = tabMap[tab] || ('screen-' + tab);
+  const sc = document.getElementById(screenId);
+  if (sc) setTimeout(()=>{ sc.classList.add('active'); sc.scrollTop=0; }, 50);
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if (SOON_TABS.has(tab)) {
+    // Keep DNA tab highlighted — user is on waitlist screen
+    document.getElementById('tab-dna').classList.add('active');
+  } else {
+    const tabId = 'tab-' + (tab === 'dna-result' ? 'dna' : tab);
+    const btn = document.getElementById(tabId);
+    if (btn) btn.classList.add('active');
+  }
+  activeTab = tab;
+  closeStyleSheet();
+}
+
+/* ── Render DNA results ── */
+function renderResults() {
+  const s = STYLE_DATA[currentStyle];
+  const imgs = getImgs(s);
+
+  document.getElementById('res-style-name').textContent = s.label;
+  document.getElementById('res-bio').textContent = s.bio;
+  document.getElementById('res-palette').innerHTML = s.palette
+    .map(c => `<div class="res-swatch" style="background:${c}"></div>`).join('');
+  document.getElementById('res-tags').innerHTML = s.tags
+    .map(t => `<span class="res-tag">${t}</span>`).join('');
+
+  const CATS = [
+    { key: 'top',       label: 'Top' },
+    { key: 'bottom',    label: 'Bottoms' },
+    { key: 'shoes',     label: 'Shoes' },
+    { key: 'accessory', label: 'Accessory' },
+  ];
+  const scrollEl = document.getElementById('look-scroll');
+  scrollEl.innerHTML = CATS.map(c => `
+    <div class="look-card">
+      <img src="${imgs[c.key]}" alt="${c.label}" loading="lazy" />
+      <div class="look-cat-chip">${c.label}</div>
+      <div class="look-label-scrim">
+        <div class="look-style-label">${s.label}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const dotsEl = document.getElementById('look-dots');
+  dotsEl.innerHTML = CATS.map((_, i) =>
+    `<div class="look-dot${i===0?' active':''}"></div>`
+  ).join('');
+
+  scrollEl.addEventListener('scroll', () => {
+    const card = scrollEl.querySelector('.look-card');
+    if (!card) return;
+    const cardW = card.offsetWidth + 12;
+    const idx = Math.round(scrollEl.scrollLeft / cardW);
+    dotsEl.querySelectorAll('.look-dot').forEach((d, i) =>
+      d.classList.toggle('active', i === idx)
+    );
+  }, { passive: true });
+}
+
+/* ── Share style DNA ── */
+function shareStyle() {
+  if (!currentStyle) return;
+  const s = STYLE_DATA[currentStyle];
+  const text = `My Style DNA is ${s.label} — ${s.tags.join(', ')}. Decode yours 🧬`;
+  const url = 'https://stylehits.vercel.app';
+  if (navigator.share) {
+    navigator.share({ title: `My Style DNA — ${s.label}`, text, url }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(text + ' ' + url).then(() => showShareToast());
+  }
+}
+function showShareToast() {
+  let t = document.getElementById('share-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'share-toast';
+    t.className = 'share-toast';
+    document.querySelector('.app').appendChild(t);
+  }
+  t.textContent = 'Link copied!';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── Waitlist ── */
+function joinWaitlist() {
+  const email = document.getElementById('waitlist-email').value.trim();
+  if (!email || !email.includes('@')) return;
+  document.getElementById('waitlist-form').style.display = 'none';
+  document.getElementById('waitlist-success').style.display = 'flex';
+}
+
+/* ── Quick-entry from home (MVP path) ── */
+const quickGrads = [
+  'linear-gradient(135deg,#2A1F1A,#3D2515)',
+  'linear-gradient(135deg,#1A2018,#253020)',
+  'linear-gradient(135deg,#1E1C28,#2A2535)',
+  'linear-gradient(135deg,#26201A,#3A2D22)',
+];
+let qIdx = 0;
+
+function quickAnalyze() {
+  const url = document.getElementById('quick-url-inp').value.trim();
+  if (!url && document.getElementById('quick-preview').children.length === 0) {
+    /* if nothing entered, jump to full DNA screen */
+    switchTab('dna');
+    return;
+  }
+  startAnalysis();
+}
+
+/* ── File input handler ── */
+function handleFileSelect(input) {
+  const files = Array.from(input.files).slice(0, 20);
+  if (!files.length) return;
+
+  const isQuick = (activeTab === 'home');
+  if (isQuick) {
+    const preview = document.getElementById('quick-preview');
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'quick-thumb';
+        thumb.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover" />
+          <div class="qthumb-rm" onclick="this.parentElement.remove()">✕</div>`;
+        preview.appendChild(thumb);
+      };
+      reader.readAsDataURL(file);
+    });
+  } else {
+    /* DNA screen upload grid */
+    const grid = document.getElementById('ugrid');
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const el = document.createElement('div');
+        el.className = 'uthumb';
+        el.innerHTML = `<img src="${e.target.result}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" />
+          <div class="uthumb-rm" onclick="this.parentElement.remove()">✕</div>`;
+        grid.appendChild(el);
+      };
+      reader.readAsDataURL(file);
+    });
+    /* update drop zone appearance */
+    const dz = document.getElementById('drop-zone');
+    dz.classList.add('has-photos');
+    dz.innerHTML = `<button class="dz-add-more" onclick="document.getElementById('file-input').click()">+ Add more photos</button>`;
+  }
+  input.value = '';
+}
+
+/* ── DNA input modes ── */
+function setMode(mode, el) {
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('mode-photos').style.display = mode==='photos'?'block':'none';
+  document.getElementById('mode-pinterest').style.display = mode==='pinterest'?'block':'none';
+  document.getElementById('mode-links').style.display = mode==='links'?'block':'none';
+}
+
+function setModeExternal(mode) {
+  const idMap = { photos:'mtab-photos', pinterest:'mtab-pinterest', links:'mtab-links' };
+  const el = document.getElementById(idMap[mode]);
+  if(el) setMode(mode, el);
+}
+
+let urlCnt = 0;
+function addUrl(type) {
+  urlCnt++;
+  const inputId = type === 'Pinterest' ? 'pinterest-inp' : 'link-inp';
+  const containerId = type === 'Pinterest' ? 'pinterest-tags' : 'added-tags';
+  const inp = document.getElementById(inputId);
+  const val = inp ? inp.value.trim() : '';
+  const label = val || `${type} ${urlCnt}`;
+  inp && (inp.value = '');
+  const c = document.getElementById(containerId);
+  const t = document.createElement('div');
+  t.className = 'atag';
+  t.innerHTML = `${type==='Pinterest'?'📌':'🔗'} ${label} <span onclick="this.parentElement.remove()" style="cursor:pointer;opacity:0.5;margin-left:2px">✕</span>`;
+  c.appendChild(t);
+}
+
+/* ── Analysis animation ── */
+const statuses = [
+  'Scanning visual inputs…',
+  'Extracting color signatures…',
+  'Mapping style dimensions…',
+  'Identifying aesthetic patterns…',
+  'Calibrating 47 style axes…',
+  'Building your DNA profile…'
+];
+
+/* ── Auto-detect gender from link keywords ── */
+function detectGenderFromInput() {
+  const urls = [
+    document.getElementById('pinterest-inp')?.value || '',
+    document.getElementById('link-inp')?.value || '',
+    document.getElementById('quick-url-inp')?.value || '',
+  ].join(' ').toLowerCase();
+
+  const menKeywords = /\b(men|mens|man|male|him|his|boy|boys|sir|groom|bro|guy|guys|menswear|mensfashion)\b/;
+  const womenKeywords = /\b(women|womens|woman|female|her|she|girl|girls|lady|ladies|womenswear|womensfashion|dress|dresses|skirt)\b/;
+
+  if (menKeywords.test(urls) && !womenKeywords.test(urls)) return 'men';
+  if (womenKeywords.test(urls) && !menKeywords.test(urls)) return 'women';
+  return 'everyone'; // ambiguous or no link — show mixed
+}
+
+function startAnalysis() {
+  const form = document.getElementById('dna-form');
+  const loading = document.getElementById('dna-loading');
+
+  /* Auto-detect gender from any pasted links */
+  userGender = detectGenderFromInput();
+
+  /* Switch to DNA tab so loading is visible */
+  document.querySelectorAll('.screen.active').forEach(s=>s.classList.remove('active'));
+  const sc = document.getElementById('screen-dna');
+  setTimeout(()=>{ sc.classList.add('active'); sc.scrollTop=0; }, 50);
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-dna').classList.add('active');
+
+  form.style.display = 'none';
+  loading.classList.add('show');
+
+  /* Reset progress bar */
+  const fill = document.getElementById('load-fill-bar');
+  if(fill) { fill.style.animation='none'; void fill.offsetWidth; fill.style.animation=''; }
+
+  let i = 0;
+  const el = document.getElementById('load-status');
+  const iv = setInterval(()=>{
+    if(i < statuses.length) el.textContent = statuses[i++];
+    else clearInterval(iv);
+  }, 460);
+
+  setTimeout(()=>{
+    clearInterval(iv);
+    loading.classList.remove('show');
+    form.style.display = 'block';
+    dnaBuilt = true;
+    hasDecode = true;
+    currentStyle = STYLE_KEYS[Math.floor(Math.random() * STYLE_KEYS.length)];
+    renderResults();
+    /* Swap home hero to "active DNA" state */
+    const mvp = document.getElementById('mvp-entry');
+    if (mvp) mvp.style.display = 'none';
+    const hero = document.getElementById('home-hero-active');
+    if (hero) hero.classList.add('visible');
+    switchTab('dna-result');
+  }, 3000);
+}
+
+/* ── Show discover after DNA result ── */
+function showDNAMatches() {
+  switchTab('discover');
+}
+
+/* ── Filter chips ── */
+function setFilter(el) {
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+}
+</script>
+</body>
+</html>
